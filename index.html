@@ -289,6 +289,90 @@
 </section>
 
 <!-- GASTOS -->
+<!-- CAJA -->
+<section id="seccion-caja" class="seccion hidden">
+  <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+    <h2 class="text-2xl font-bold" style="color:#8a6a10;">🏦 Caja</h2>
+    <button onclick="abrirSaldoInicial()" class="px-3 py-2 rounded text-sm font-semibold" style="background:#ffffff;border:1px solid #b8860b;color:#111111;">⚙️ Saldo inicial</button>
+  </div>
+  <div id="caja-aviso-inicio" class="hidden mb-4 p-4 rounded" style="background:#fdf6e3;border:1px solid #b8860b;color:#111111;">
+    <strong>Primero configura el saldo inicial.</strong> Escribe cuánta plata tenías en la cuenta en una fecha, y desde ese día la app suma y resta todo lo que entra y sale.
+    <div class="mt-2"><button onclick="abrirSaldoInicial()" class="text-black px-4 py-2 rounded font-semibold" style="background:linear-gradient(135deg,#d4af37,#b8860b);">Configurar ahora</button></div>
+  </div>
+  <div class="grid md:grid-cols-3 gap-3 mb-4">
+    <div class="rounded-lg p-4 text-center md:col-span-1" style="background:#fdf6e3;border:2px solid #b8860b;">
+      <div class="text-sm font-semibold" style="color:#111111;">💰 Debe haber en la cuenta</div>
+      <div id="caja-saldo" class="text-3xl font-extrabold mt-1" style="color:#111111;">$0</div>
+      <div id="caja-desde" class="text-xs mt-1" style="color:#555555;"></div>
+    </div>
+    <div class="rounded-lg p-4 text-center" style="background:#ecfdf3;border:1px solid #86efac;">
+      <div class="text-sm font-semibold" style="color:#111111;">⬆️ Entró este mes</div>
+      <div id="caja-entradas-mes" class="text-2xl font-bold mt-1" style="color:#15803d;">$0</div>
+    </div>
+    <div class="rounded-lg p-4 text-center" style="background:#fef2f2;border:1px solid #fca5a5;">
+      <div class="text-sm font-semibold" style="color:#111111;">⬇️ Salió este mes</div>
+      <div id="caja-salidas-mes" class="text-2xl font-bold mt-1" style="color:#b91c1c;">$0</div>
+    </div>
+  </div>
+
+  <div class="rounded-lg p-4 mb-6" style="background:#ffffff;border:1px solid #d6d3d1;">
+    <h3 class="font-bold text-lg mb-2" style="color:#111111;">✅ Cuadrar con la cuenta</h3>
+    <p class="text-sm mb-3" style="color:#444444;">Escribe cuánto tienes realmente en la cuenta o en efectivo ahora mismo.</p>
+    <div class="flex gap-3 flex-wrap items-end">
+      <div>
+        <label class="block text-sm font-semibold mb-1">Saldo real</label>
+        <input type="number" id="caja-real" step="100" oninput="calcularDiferenciaCaja()" class="p-2 border rounded text-lg font-bold w-56" style="border-color:#d6d3d1;" placeholder="$" />
+      </div>
+      <div id="caja-diferencia" class="text-sm font-semibold pb-2"></div>
+      <button onclick="guardarCuadre()" class="text-black px-4 py-2 rounded font-semibold ml-auto" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Guardar cuadre</button>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mb-3 items-center flex-wrap">
+    <h3 class="font-bold text-lg mr-2" style="color:#111111;">📒 Movimientos</h3>
+    <label class="font-semibold text-sm">Mes:</label>
+    <input type="month" id="mes-caja" onchange="renderCaja()" class="p-2 border rounded" style="border-color:#d6d3d1;" />
+    <select id="filtro-caja" onchange="renderCaja()" class="p-2 border rounded text-sm" style="border-color:#d6d3d1;">
+      <option value="todos">Todos</option>
+      <option value="entradas">Solo entradas</option>
+      <option value="salidas">Solo salidas</option>
+    </select>
+  </div>
+  <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#ffffff;border:1px solid #d6d3d1;">
+    <table class="w-full text-sm">
+      <thead style="background:#f7ecc8;color:#111111;">
+        <tr>
+          <th class="p-3 text-center">#</th>
+          <th class="p-3 text-left">Fecha</th>
+          <th class="p-3 text-left">Movimiento</th>
+          <th class="p-3 text-left">Detalle</th>
+          <th class="p-3 text-right">Entrada</th>
+          <th class="p-3 text-right">Salida</th>
+          <th class="p-3 text-right">Saldo</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-caja"></tbody>
+    </table>
+  </div>
+
+  <h3 class="font-bold text-lg mb-2" style="color:#111111;">🗂️ Historial de cuadres</h3>
+  <div class="rounded-lg shadow overflow-x-auto" style="background:#ffffff;border:1px solid #d6d3d1;">
+    <table class="w-full text-sm">
+      <thead style="background:#f7ecc8;color:#111111;">
+        <tr>
+          <th class="p-3 text-left">Fecha</th>
+          <th class="p-3 text-right">Según la app</th>
+          <th class="p-3 text-right">Real</th>
+          <th class="p-3 text-right">Diferencia</th>
+          <th class="p-3 text-left">Nota</th>
+          <th class="p-3 text-left">Quién</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-cuadres"></tbody>
+    </table>
+  </div>
+</section>
+
 <section id="seccion-gastos" class="seccion hidden">
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-2xl font-bold" style="color:#8a6a10;">Gastos y Movimientos</h2>
@@ -672,6 +756,31 @@
 </div>
 
 <!-- ============ FIREBASE SDK Y LÓGICA ============ -->
+<!-- ============ MODAL SALDO INICIAL ============ -->
+<div id="modal-saldo-inicial" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
+  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-md my-8">
+    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#fdf6e3,#f7ecc8);border-bottom:1px solid #b8860b;">
+      <h3 class="text-xl font-bold" style="color:#8a6a10;">⚙️ Saldo inicial de caja</h3>
+      <button onclick="cerrarModal('modal-saldo-inicial')" class="text-2xl">×</button>
+    </div>
+    <form id="form-saldo-inicial" class="p-6 space-y-3">
+      <p class="text-sm" style="color:#444444;">Mira cuánto tenías en la cuenta en una fecha. Desde ese día la app cuenta todos los cobros, préstamos, gastos, retiros, ingresos y aportes.</p>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Fecha de inicio *</label>
+        <input type="date" id="si-fecha" required class="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Saldo en la cuenta ese día (antes de los movimientos de ese día) *</label>
+        <input type="number" id="si-monto" required step="100" class="w-full p-2 border rounded text-lg font-bold" />
+      </div>
+      <div class="flex gap-2 justify-end pt-3 border-t">
+        <button type="button" onclick="cerrarModal('modal-saldo-inicial')" class="px-4 py-2 rounded" style="background:#e7e5e4;">Cancelar</button>
+        <button type="submit" class="text-black px-4 py-2 rounded font-semibold" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
@@ -699,7 +808,7 @@ const dbFS = getFirestore(app);
 
 window.estado = {
   user: null, rol: null, nombre: null,
-  clientes: [], prestamos: [], gastos: [], usuarios: [],
+  clientes: [], prestamos: [], gastos: [], usuarios: [], cajaMovs: [], cajaConfig: null,
   config: { interes: 20, cuotas: 30, mora: 20 }
 };
 window.filtroPrestamos = 'todos';
@@ -890,7 +999,7 @@ function construirMenu() {
   const tabs=[];
   if(estado.rol==='admin') {
     tabs.push(['dashboard','📊 Dashboard'],['clientes','👥 Clientes'],['prestamos','💵 Préstamos'],
-      ['pagos','📅 Pagos del Día'],['gastos','💸 Gastos'],['reportes','📈 Reportes'],
+      ['pagos','📅 Pagos del Día'],['caja','🏦 Caja'],['gastos','💸 Gastos'],['reportes','📈 Reportes'],
       ['usuarios','👤 Usuarios'],['auditoria','📋 Auditoría'],['config','⚙️ Config']);
   } else if(estado.rol==='cobrador') {
     tabs.push(['pagos','📅 Pagos del Día'],['clientes','👥 Clientes'],['prestamos','💵 Préstamos']);
@@ -920,6 +1029,7 @@ window.cambiarTab = function(tab) {
   if(tab==='usuarios') renderUsuarios();
   if(tab==='auditoria') renderAuditoria();
   if(tab==='config') cargarConfig();
+  if(tab==='caja') renderCaja();
 };
 
 window.abrirModal = function(id) { const m=document.getElementById(id); m.classList.remove('hidden'); m.style.display='flex'; };
@@ -933,6 +1043,8 @@ function iniciarSync() {
   unsubs.push(onSnapshot(collection(dbFS,'prestamos'),(snap)=>{ estado.prestamos=snap.docs.map(d=>({id:d.id,...d.data()})); refreshUI(); }));
   if(estado.rol==='admin') {
     unsubs.push(onSnapshot(collection(dbFS,'gastos'),(snap)=>{ estado.gastos=snap.docs.map(d=>({id:d.id,...d.data()})); refreshUI(); }));
+    unsubs.push(onSnapshot(collection(dbFS,'caja'),(snap)=>{ estado.cajaMovs=snap.docs.map(d=>({id:d.id,...d.data()})); refreshUI(); }));
+    unsubs.push(onSnapshot(doc(dbFS,'config','caja'),(snap)=>{ estado.cajaConfig=snap.exists()?snap.data():null; refreshUI(); }));
     unsubs.push(onSnapshot(collection(dbFS,'users'),(snap)=>{ estado.usuarios=snap.docs.map(d=>({id:d.id,...d.data()})); if(!document.getElementById('seccion-usuarios').classList.contains('hidden')) renderUsuarios(); }));
   }
   unsubs.push(onSnapshot(doc(dbFS,'config','global'),(snap)=>{ if(snap.exists()) estado.config={...estado.config,...snap.data()}; }));
@@ -1699,19 +1811,162 @@ window.mostrarDesglose = function(tipo) {
   document.getElementById('desglose-contenido').innerHTML=html; abrirModal('modal-desglose');
 };
 
+// ============================================================
+// CAJA (saldo que debe haber en la cuenta)
+// ============================================================
+function movimientosCaja() {
+  const movs=[];
+  const cliNom=id=>estado.clientes.find(c=>c.id===id)?.nombre||'?';
+  estado.prestamos.forEach(p=>{
+    if(p.fechaDesembolso && p.monto) movs.push({fecha:p.fechaDesembolso, orden:1, tipo:'📤 Préstamo entregado', detalle:cliNom(p.clienteId), monto:-(p.monto||0)});
+    (p.cuotas||[]).forEach(c=>{
+      if((c.estado==='pagado'||c.estado==='parcial') && c.fechaPago && (c.montoPagado||0)>0)
+        movs.push({fecha:c.fechaPago, orden:2, tipo:'💰 Cobro', detalle:`${cliNom(p.clienteId)} — cuota ${c.numero}/${p.numCuotas||(p.cuotas||[]).length}`, monto:c.montoPagado||0});
+    });
+  });
+  (estado.gastos||[]).forEach(g=>{
+    if(!g.fecha) return;
+    const entra = g.tipo==='ingreso'||g.tipo==='capital';
+    movs.push({fecha:g.fecha, orden:3, tipo:nombreTipo(g.tipo), detalle:[g.categoria,g.descripcion].filter(Boolean).join(' — ')||'-', monto:entra?(g.monto||0):-(g.monto||0)});
+  });
+  (estado.cajaMovs||[]).filter(m=>m.tipo==='ajuste').forEach(m=>{
+    movs.push({fecha:m.fecha, orden:4, tipo:'⚖️ Ajuste de cuadre', detalle:m.nota||'-', monto:m.monto||0});
+  });
+  movs.sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.orden-b.orden);
+  return movs;
+}
+
+function calcularCaja() {
+  const cfg=estado.cajaConfig;
+  const inicio=cfg?.fechaInicio||null;
+  let saldo=cfg?Number(cfg.saldoInicial||0):0;
+  const movs=movimientosCaja().filter(m=>!inicio||m.fecha>=inicio);
+  movs.forEach(m=>{ saldo+=m.monto; m.saldo=saldo; });
+  return {movs, saldo, inicio, saldoInicial:cfg?Number(cfg.saldoInicial||0):0};
+}
+
+window.renderCaja = function() {
+  if(estado.rol!=='admin') return;
+  const mesEl=document.getElementById('mes-caja');
+  if(!mesEl.value) mesEl.value=hoy().slice(0,7);
+  const mes=mesEl.value;
+  const filtro=document.getElementById('filtro-caja').value;
+  const {movs, saldo, inicio, saldoInicial}=calcularCaja();
+  document.getElementById('caja-aviso-inicio').classList.toggle('hidden', !!inicio);
+  document.getElementById('caja-saldo').textContent=fmt(saldo);
+  document.getElementById('caja-saldo').style.color=saldo<0?'#b91c1c':'#111111';
+  document.getElementById('caja-desde').textContent=inicio?`Desde el ${fechaBonita(inicio)} con saldo inicial de ${fmt(saldoInicial)}`:'Sin saldo inicial configurado';
+  const delMes=movs.filter(m=>m.fecha.startsWith(mes));
+  document.getElementById('caja-entradas-mes').textContent=fmt(delMes.filter(m=>m.monto>0).reduce((s,m)=>s+m.monto,0));
+  document.getElementById('caja-salidas-mes').textContent=fmt(-delMes.filter(m=>m.monto<0).reduce((s,m)=>s+m.monto,0));
+
+  // Saldo con el que arranca el mes
+  const previos=movs.filter(m=>m.fecha<mes+'-01');
+  const saldoAnterior=previos.length?previos[previos.length-1].saldo:saldoInicial;
+  let filas=delMes;
+  if(filtro==='entradas') filas=filas.filter(m=>m.monto>0);
+  if(filtro==='salidas') filas=filas.filter(m=>m.monto<0);
+  const tbody=document.getElementById('tabla-caja');
+  let html=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs" colspan="5"><strong>Saldo al empezar el mes</strong></td><td class="p-3 text-right font-bold">${fmt(saldoAnterior)}</td></tr>`;
+  html+=filas.length===0?'<tr><td colspan="7" class="p-6 text-center text-slate-400">Sin movimientos este mes</td></tr>':
+    filas.map((m,i)=>`<tr class="border-b">
+      <td class="p-3 text-center text-slate-500 font-semibold">${i+1}</td>
+      <td class="p-3 text-xs">${fechaBonita(m.fecha)}</td>
+      <td class="p-3">${m.tipo}</td>
+      <td class="p-3 text-xs">${m.detalle}</td>
+      <td class="p-3 text-right font-semibold" style="color:#15803d;">${m.monto>0?fmt(m.monto):''}</td>
+      <td class="p-3 text-right font-semibold" style="color:#b91c1c;">${m.monto<0?fmt(-m.monto):''}</td>
+      <td class="p-3 text-right font-bold">${fmt(m.saldo)}</td>
+    </tr>`).join('');
+  tbody.innerHTML=html;
+
+  const cuadres=(estado.cajaMovs||[]).filter(m=>m.tipo==='cuadre').sort((a,b)=>(b.creadoISO||'').localeCompare(a.creadoISO||''));
+  document.getElementById('tabla-cuadres').innerHTML=cuadres.length===0?'<tr><td colspan="6" class="p-6 text-center text-slate-400">Todavía no has guardado cuadres</td></tr>':
+    cuadres.map(c=>`<tr class="border-b">
+      <td class="p-3 text-xs">${c.creadoISO?new Date(c.creadoISO).toLocaleString('es-CO',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):fechaBonita(c.fecha)}</td>
+      <td class="p-3 text-right">${fmt(c.saldoApp)}</td>
+      <td class="p-3 text-right">${fmt(c.saldoReal)}</td>
+      <td class="p-3 text-right font-bold" style="color:${c.diferencia===0?'#15803d':'#b91c1c'};">${c.diferencia===0?'✅ Cuadra':(c.diferencia>0?'+':'')+fmt(c.diferencia)}${c.ajustado?'<div class="text-xs font-normal" style="color:#555555;">ajustado</div>':''}</td>
+      <td class="p-3 text-xs">${c.nota||''}</td>
+      <td class="p-3 text-xs">${c.userNombre||''}</td>
+    </tr>`).join('');
+  calcularDiferenciaCaja();
+};
+
+window.calcularDiferenciaCaja = function() {
+  const el=document.getElementById('caja-diferencia');
+  const v=document.getElementById('caja-real').value;
+  if(v===''){ el.innerHTML=''; return; }
+  const dif=Number(v)-calcularCaja().saldo;
+  el.innerHTML=dif===0?'<span style="color:#15803d;">✅ La caja cuadra exacto</span>':
+    `<span style="color:#b91c1c;">${dif>0?'⬆️ Hay '+fmt(dif)+' de MÁS en la cuenta':'⬇️ Faltan '+fmt(-dif)+' en la cuenta'}</span>`;
+};
+
+window.guardarCuadre = async function() {
+  if(estado.rol!=='admin') return;
+  if(!estado.cajaConfig) return alert('Primero configura el saldo inicial.');
+  const v=document.getElementById('caja-real').value;
+  if(v==='') return alert('Escribe el saldo real de la cuenta');
+  const saldoReal=Number(v);
+  const saldoApp=calcularCaja().saldo;
+  const dif=saldoReal-saldoApp;
+  let nota='', ajustado=false;
+  if(dif===0) {
+    if(!confirm(`✅ La caja cuadra: ${fmt(saldoReal)}\n\n¿Guardar el cuadre?`)) return;
+  } else {
+    nota=prompt(`La app dice ${fmt(saldoApp)} y en la cuenta hay ${fmt(saldoReal)}.\nDiferencia: ${dif>0?'+':''}${fmt(dif)}\n\nAntes de ajustar, revisa en "Movimientos" si falta registrar algún cobro, gasto o retiro.\n\nSi ya revisaste, escribe por qué hay diferencia (obligatorio):`,'');
+    if(nota===null) return;
+    nota=nota.trim();
+    if(!nota) return alert('Necesitas escribir el motivo de la diferencia.');
+    ajustado=confirm(`¿Ajustar la caja para que quede igual a la cuenta (${fmt(saldoReal)})?\n\nAceptar = se registra un ajuste de ${dif>0?'+':''}${fmt(dif)}\nCancelar = solo se guarda el cuadre con la diferencia`);
+  }
+  try {
+    const base={fecha:hoy(), creadoISO:new Date().toISOString(), userId:estado.user.uid, userNombre:estado.nombre||estado.user.email, createdAt:serverTimestamp()};
+    await addDoc(collection(dbFS,'caja'),{...base, tipo:'cuadre', saldoApp, saldoReal, diferencia:dif, nota, ajustado});
+    if(ajustado) await addDoc(collection(dbFS,'caja'),{...base, tipo:'ajuste', monto:dif, nota});
+    await auditar('cuadre_caja',`App: ${fmt(saldoApp)}, Real: ${fmt(saldoReal)}, Diferencia: ${fmt(dif)}${ajustado?' (ajustado)':''}${nota?', Motivo: '+nota:''}`);
+    document.getElementById('caja-real').value=''; calcularDiferenciaCaja();
+    alert(ajustado?'✅ Cuadre guardado y caja ajustada':'✅ Cuadre guardado');
+  } catch(e){ alert('Error: '+e.message); }
+};
+
+window.abrirSaldoInicial = function() {
+  if(estado.rol!=='admin') return;
+  const cfg=estado.cajaConfig;
+  document.getElementById('si-fecha').value=cfg?.fechaInicio||hoy();
+  document.getElementById('si-monto').value=cfg?(cfg.saldoInicial??''):'';
+  abrirModal('modal-saldo-inicial');
+};
+
+document.getElementById('form-saldo-inicial').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(estado.rol!=='admin') return;
+  const fechaInicio=document.getElementById('si-fecha').value;
+  const saldoInicial=Number(document.getElementById('si-monto').value);
+  if(!fechaInicio || isNaN(saldoInicial)) return alert('Revisa la fecha y el saldo');
+  try {
+    const antes=estado.cajaConfig;
+    await setDoc(doc(dbFS,'config','caja'),{fechaInicio, saldoInicial, actualizadoPor:estado.nombre||estado.user.email, actualizadoAt:serverTimestamp()});
+    await auditar('saldo_inicial_caja',`Fecha: ${fechaInicio}, Saldo: ${fmt(saldoInicial)}${antes?` (antes: ${antes.fechaInicio}, ${fmt(antes.saldoInicial)})`:''}`);
+    cerrarModal('modal-saldo-inicial');
+  } catch(err){ alert('Error: '+err.message); }
+});
+
 window.mostrarCajaHoy = function() {
   const hoyStr=hoy(); document.getElementById('desglose-titulo').textContent='💵 Caja de Hoy — '+fechaBonita(hoyStr);
   const pagosHoy=[]; let totalCobrado=0;
   estado.prestamos.forEach(p=>{ const cli=estado.clientes.find(x=>x.id===p.clienteId); (p.cuotas||[]).forEach(c=>{ if((c.estado==='pagado'||c.estado==='parcial')&&c.fechaPago===hoyStr){ pagosHoy.push({nombre:cli?cli.nombre:'?',cuota:`Cuota ${c.numero}/${p.numCuotas}`,hora:c.registradoAt?new Date(c.registradoAt).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}):'-',monto:c.montoPagado||0}); totalCobrado+=c.montoPagado||0; } }); });
   pagosHoy.sort((a,b)=>a.hora.localeCompare(b.hora));
   const salidasHoy=[]; let totalSalidas=0;
-  (estado.gastos||[]).forEach(g=>{ if(g.fecha!==hoyStr) return; if(g.tipo==='gasto'||g.tipo==='retiro'){ salidasHoy.push({desc:g.descripcion||g.categoria||'-',tipo:nombreTipo(g.tipo),monto:g.monto||0}); totalSalidas+=g.monto||0; } });
-  const netoCaja=totalCobrado-totalSalidas;
+  let totalEntradasHoy=0;
+  estado.prestamos.forEach(p=>{ if(p.fechaDesembolso===hoyStr && p.monto){ const cli=estado.clientes.find(x=>x.id===p.clienteId); salidasHoy.push({desc:cli?cli.nombre:'?',tipo:'📤 Préstamo entregado',monto:p.monto||0}); totalSalidas+=p.monto||0; } });
+  (estado.gastos||[]).forEach(g=>{ if(g.fecha!==hoyStr) return; if(g.tipo==='gasto'||g.tipo==='retiro'||g.tipo==='viaticos'){ salidasHoy.push({desc:g.descripcion||g.categoria||'-',tipo:nombreTipo(g.tipo),monto:g.monto||0}); totalSalidas+=g.monto||0; } else if(g.tipo==='ingreso'||g.tipo==='capital'){ totalEntradasHoy+=g.monto||0; } });
+  const netoCaja=totalCobrado+totalEntradasHoy-totalSalidas;
   let html='';
   if(pagosHoy.length===0) html+='<p class="text-slate-400 text-sm italic mb-4">Sin pagos registrados hoy.</p>';
   else html+=`<h4 class="font-bold text-slate-700 mb-2">💰 Pagos recibidos hoy (${pagosHoy.length})</h4><table class="w-full text-sm mb-4 border-collapse"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-2 text-left">Cliente</th><th class="p-2 text-left">Cuota</th><th class="p-2 text-center">Hora</th><th class="p-2 text-right">Monto</th></tr></thead><tbody>${pagosHoy.map(r=>`<tr class="border-b hover:bg-slate-50"><td class="p-2 font-semibold">${r.nombre}</td><td class="p-2 text-slate-500 text-xs">${r.cuota}</td><td class="p-2 text-center text-slate-400 text-xs">${r.hora}</td><td class="p-2 text-right font-bold text-green-700">${fmt(r.monto)}</td></tr>`).join('')}</tbody><tfoot><tr class="bg-green-50 font-bold"><td class="p-2" colspan="3">Total cobrado</td><td class="p-2 text-right text-green-700">${fmt(totalCobrado)}</td></tr></tfoot></table>`;
   if(salidasHoy.length>0) html+=`<h4 class="font-bold text-slate-700 mb-2">💸 Salidas de hoy</h4><table class="w-full text-sm mb-4 border-collapse"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-2 text-left">Descripción</th><th class="p-2 text-left">Tipo</th><th class="p-2 text-right">Monto</th></tr></thead><tbody>${salidasHoy.map(r=>`<tr class="border-b hover:bg-slate-50"><td class="p-2">${r.desc}</td><td class="p-2 text-slate-500 text-xs">${r.tipo}</td><td class="p-2 text-right font-bold text-red-700">-${fmt(r.monto)}</td></tr>`).join('')}</tbody><tfoot><tr class="bg-red-50 font-bold"><td class="p-2" colspan="2">Total salidas</td><td class="p-2 text-right text-red-700">-${fmt(totalSalidas)}</td></tr></tfoot></table>`;
-  html+=`<div class="mt-2 p-4 rounded-lg border-2 font-bold text-lg text-center ${netoCaja>=0?'bg-teal-50 border-teal-400 text-teal-700':'bg-red-50 border-red-400 text-red-700'}">💵 DEBE HABER EN CAJA HOY: ${fmt(netoCaja)}</div>`;
+  html+=`<div class="mt-2 p-4 rounded-lg border-2 font-bold text-lg text-center ${netoCaja>=0?'bg-teal-50 border-teal-400 text-teal-700':'bg-red-50 border-red-400 text-red-700'}">💵 MOVIMIENTO NETO DE HOY: ${netoCaja>=0?'+':''}${fmt(netoCaja)}</div>${totalEntradasHoy>0?`<p class="text-sm text-center mt-2">Incluye ${fmt(totalEntradasHoy)} de ingresos/aportes</p>`:''}${estado.cajaConfig?`<div class="mt-3 p-3 rounded-lg text-center font-bold" style="background:#fdf6e3;border:2px solid #b8860b;">🏦 Debe haber en la cuenta: ${fmt(calcularCaja().saldo)}</div>`:''}`;
   document.getElementById('desglose-contenido').innerHTML=html; abrirModal('modal-desglose');
 };
 
@@ -1725,7 +1980,7 @@ window.mostrarCajaMes = function() {
   const prestamos=[]; let totalPrestado=0;
   estado.prestamos.forEach(p=>{ if(p.fechaDesembolso&&p.fechaDesembolso.startsWith(mesStr)){ const cli=estado.clientes.find(x=>x.id===p.clienteId); prestamos.push({nombre:cli?cli.nombre:'?',fecha:p.fechaDesembolso,monto:p.monto}); totalPrestado+=p.monto; } });
   const salidas=[],entradas=[]; let totalSalidas=0,totalEntradas=0;
-  (estado.gastos||[]).forEach(g=>{ if(!g.fecha||!g.fecha.startsWith(mesStr)) return; if(g.tipo==='gasto'||g.tipo==='retiro'){ salidas.push({desc:g.descripcion||g.categoria||'-',tipo:nombreTipo(g.tipo),fecha:g.fecha,monto:g.monto||0}); totalSalidas+=g.monto||0; } else { entradas.push({desc:g.descripcion||g.categoria||'-',tipo:nombreTipo(g.tipo),fecha:g.fecha,monto:g.monto||0}); totalEntradas+=g.monto||0; } });
+  (estado.gastos||[]).forEach(g=>{ if(!g.fecha||!g.fecha.startsWith(mesStr)) return; if(g.tipo==='gasto'||g.tipo==='retiro'||g.tipo==='viaticos'){ salidas.push({desc:g.descripcion||g.categoria||'-',tipo:nombreTipo(g.tipo),fecha:g.fecha,monto:g.monto||0}); totalSalidas+=g.monto||0; } else { entradas.push({desc:g.descripcion||g.categoria||'-',tipo:nombreTipo(g.tipo),fecha:g.fecha,monto:g.monto||0}); totalEntradas+=g.monto||0; } });
   const neto=totalCobrado+totalEntradas-totalPrestado-totalSalidas;
   const tablaSimple=(titulo,filas,colorM,total,colorT)=>{
     if(!filas.length) return `<p class="text-slate-400 text-sm italic mb-3">Sin ${titulo.toLowerCase()}</p>`;
