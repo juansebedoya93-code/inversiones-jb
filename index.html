@@ -306,11 +306,11 @@
       <div id="caja-desde" class="text-xs mt-1" style="color:#555555;"></div>
     </div>
     <div class="rounded-lg p-4 text-center" style="background:#ecfdf3;border:1px solid #86efac;">
-      <div class="text-sm font-semibold" style="color:#111111;">⬆️ Entró este mes</div>
+      <div class="text-sm font-semibold" style="color:#111111;">⬆️ Entró en el mes</div>
       <div id="caja-entradas-mes" class="text-2xl font-bold mt-1" style="color:#15803d;">$0</div>
     </div>
     <div class="rounded-lg p-4 text-center" style="background:#fef2f2;border:1px solid #fca5a5;">
-      <div class="text-sm font-semibold" style="color:#111111;">⬇️ Salió este mes</div>
+      <div class="text-sm font-semibold" style="color:#111111;">⬇️ Salió en el mes</div>
       <div id="caja-salidas-mes" class="text-2xl font-bold mt-1" style="color:#b91c1c;">$0</div>
     </div>
   </div>
@@ -1833,6 +1833,7 @@ function movimientosCaja() {
     movs.push({fecha:m.fecha, orden:4, tipo:'⚖️ Ajuste de cuadre', detalle:m.nota||'-', monto:m.monto||0});
   });
   movs.sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.orden-b.orden);
+  movs.forEach((m,i)=>m.k=i);
   return movs;
 }
 
@@ -1856,28 +1857,41 @@ window.renderCaja = function() {
   document.getElementById('caja-saldo').textContent=fmt(saldo);
   document.getElementById('caja-saldo').style.color=saldo<0?'#b91c1c':'#111111';
   document.getElementById('caja-desde').textContent=inicio?`Desde el ${fechaBonita(inicio)} con saldo inicial de ${fmt(saldoInicial)}`:'Sin saldo inicial configurado';
-  const delMes=movs.filter(m=>m.fecha.startsWith(mes));
-  document.getElementById('caja-entradas-mes').textContent=fmt(delMes.filter(m=>m.monto>0).reduce((s,m)=>s+m.monto,0));
-  document.getElementById('caja-salidas-mes').textContent=fmt(-delMes.filter(m=>m.monto<0).reduce((s,m)=>s+m.monto,0));
-
-  // Saldo con el que arranca el mes
-  const previos=movs.filter(m=>m.fecha<mes+'-01');
-  const saldoAnterior=previos.length?previos[previos.length-1].saldo:saldoInicial;
-  let filas=delMes;
+  // Todo el mes (para las tarjetas y la lista), aunque sea antes del saldo inicial
+  const todosMes=movimientosCaja().filter(m=>m.fecha.startsWith(mes));
+  document.getElementById('caja-entradas-mes').textContent=fmt(todosMes.filter(m=>m.monto>0).reduce((s,m)=>s+m.monto,0));
+  document.getElementById('caja-salidas-mes').textContent=fmt(-todosMes.filter(m=>m.monto<0).reduce((s,m)=>s+m.monto,0));
+  // Saldo corrido solo desde el saldo inicial
+  const saldoPorK=new Map(movs.map(m=>[m.k, m.saldo]));
+  let filas=todosMes.map(m=>({...m, antes: !!(inicio && m.fecha<inicio), saldo: saldoPorK.has(m.k)?saldoPorK.get(m.k):null}));
   if(filtro==='entradas') filas=filas.filter(m=>m.monto>0);
   if(filtro==='salidas') filas=filas.filter(m=>m.monto<0);
   const tbody=document.getElementById('tabla-caja');
-  let html=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs" colspan="5"><strong>Saldo al empezar el mes</strong></td><td class="p-3 text-right font-bold">${fmt(saldoAnterior)}</td></tr>`;
-  html+=filas.length===0?'<tr><td colspan="7" class="p-6 text-center text-slate-400">Sin movimientos este mes</td></tr>':
-    filas.map((m,i)=>`<tr class="border-b">
-      <td class="p-3 text-center text-slate-500 font-semibold">${i+1}</td>
+  const mesInicio=inicio?inicio.slice(0,7):null;
+  let html='';
+  if(inicio && mesInicio<mes) {
+    const previos=movs.filter(m=>m.fecha<mes+'-01');
+    const saldoAnterior=previos.length?previos[previos.length-1].saldo:saldoInicial;
+    html+=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs" colspan="5"><strong>Saldo al empezar el mes</strong></td><td class="p-3 text-right font-bold">${fmt(saldoAnterior)}</td></tr>`;
+  }
+  const filaInicio=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs">${inicio?fechaBonita(inicio):''}</td><td class="p-3" colspan="4"><strong>⚙️ Saldo inicial de caja</strong></td><td class="p-3 text-right font-bold">${fmt(saldoInicial)}</td></tr>`;
+  let puesto=!(inicio && mesInicio===mes);
+  let n=0;
+  filas.forEach(m=>{
+    if(!puesto && !m.antes){ html+=filaInicio; puesto=true; }
+    n++;
+    html+=`<tr class="border-b" ${m.antes?'style="opacity:.55;"':''}>
+      <td class="p-3 text-center text-slate-500 font-semibold">${n}</td>
       <td class="p-3 text-xs">${fechaBonita(m.fecha)}</td>
       <td class="p-3">${m.tipo}</td>
       <td class="p-3 text-xs">${m.detalle}</td>
       <td class="p-3 text-right font-semibold" style="color:#15803d;">${m.monto>0?fmt(m.monto):''}</td>
       <td class="p-3 text-right font-semibold" style="color:#b91c1c;">${m.monto<0?fmt(-m.monto):''}</td>
-      <td class="p-3 text-right font-bold">${fmt(m.saldo)}</td>
-    </tr>`).join('');
+      <td class="p-3 text-right font-bold">${m.antes?'<span class="text-xs font-normal">ya incluido en el saldo inicial</span>':(m.saldo!=null?fmt(m.saldo):'')}</td>
+    </tr>`;
+  });
+  if(!puesto) html+=filaInicio;
+  if(n===0 && puesto && !(inicio && mesInicio===mes)) html+='<tr><td colspan="7" class="p-6 text-center text-slate-400">Sin movimientos este mes</td></tr>';
   tbody.innerHTML=html;
 
   const cuadres=(estado.cajaMovs||[]).filter(m=>m.tipo==='cuadre').sort((a,b)=>(b.creadoISO||'').localeCompare(a.creadoISO||''));
