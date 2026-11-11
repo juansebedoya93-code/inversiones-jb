@@ -7,38 +7,42 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0a0a; color: #e5e5e5; }
-  .tab-active { background-color: #b8860b; color: #000 !important; font-weight: 800; }
-  .tab-inactive { background-color: #1a1a1a; color: #d4af37; border: 1px solid #333; }
-  .tab-btn:hover { background-color: #2a2a2a !important; }
-  .modal-backdrop { background-color: rgba(0,0,0,0.7); }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #ffffff; color: #111111; }
+  h1, h2 { color: #8a6a10 !important; }
+  .tab-active { background-color: #b8860b; color: #000 !important; font-weight: 800; border: 1px solid #b8860b; }
+  .tab-inactive { background-color: #ffffff; color: #111111; border: 1px solid #d6d3d1; }
+  .tab-btn:hover { background-color: #fdf6e3 !important; }
+  .modal-backdrop { background-color: rgba(0,0,0,0.5); }
   .seccion { padding: 1.5rem; }
   .seccion.hidden { display: none !important; }
   .filtro-btn { transition: all 0.15s; }
-  .filtro-btn.activo { background-color: #b8860b !important; color: #000 !important; font-weight: 700; }
+  .filtro-btn.activo { background: linear-gradient(135deg,#d4af37,#b8860b) !important; color: #000 !important; font-weight: 700; border: none !important; }
 
-  /* ── Tablas oscuras globales ── */
-  #app-principal table tbody tr { background: #1a1a1a; color: #e5e5e5; border-color: #2a2a2a; }
-  #app-principal table tbody tr:hover { background: #242424 !important; }
-  #app-principal table tbody td { color: #e5e5e5; border-color: #2a2a2a; }
-  #app-principal table tbody tr.bg-red-50 { background: #2a0a0a !important; }
+  /* ── Tablas claras globales ── */
+  #app-principal table tbody tr { background: #ffffff; color: #111111; border-color: #e7e5e4; }
+  #app-principal table tbody tr:hover { background: #fdf6e3 !important; }
+  #app-principal table tbody td { color: #111111; border-color: #e7e5e4; }
+  #app-principal table tbody tr.bg-red-50 { background: #fef2f2 !important; }
+  #app-principal table thead { background: #f7ecc8 !important; color: #111111 !important; }
 
-  /* Badges de estado con fondo oscuro */
-  .badge-activo { background: #0a1a2a; color: #60a5fa; border: 1px solid #1e40af; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-  .badge-mora   { background: #2a0a0a; color: #f87171; border: 1px solid #991b1b; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-  .badge-pagado { background: #0a2a0a; color: #4ade80; border: 1px solid #166534; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+  /* Badges de estado */
+  .badge-activo { background: #eff6ff; color: #1d4ed8; border: 1px solid #1e40af; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+  .badge-mora   { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+  .badge-pagado { background: #ecfdf3; color: #15803d; border: 1px solid #166534; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
 
-  /* Modales oscuros */
-  .modal-dark { background: #141414 !important; color: #e5e5e5; }
+  /* Modales claros */
+  .modal-dark { background: #ffffff !important; color: #111111; }
   .modal-dark input, .modal-dark select, .modal-dark textarea {
-    background: #1e1e1e !important; border-color: #333 !important;
-    color: #e5e5e5 !important;
+    background: #ffffff !important; border-color: #d6d3d1 !important;
+    color: #111111 !important;
   }
-  .modal-dark label { color: #d4af37; }
+  .modal-dark label { color: #111111; }
+  input, select, textarea { color: #111111; }
+  input::placeholder, textarea::placeholder { color: #9ca3af; }
 
-  /* Scrollbar oscura */
+  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-track { background: #f5f5f4; }
   ::-webkit-scrollbar-thumb { background: #b8860b; border-radius: 3px; }
 
   @media print {
@@ -54,19 +58,19 @@
   .print-header { display: none; }
 </style>
 </head>
-<body style="background:#0a0a0a; color:#e5e5e5;" class="min-h-screen">
+<body style="background:#ffffff; color:#111111;" class="min-h-screen">
 
 <!-- ============ PANTALLA DE CARGA ============ -->
-<div id="pantalla-carga" class="fixed inset-0 flex items-center justify-center z-50 text-white" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1200 100%);">
+<div id="pantalla-carga" class="fixed inset-0 flex items-center justify-center z-50" style="background: linear-gradient(135deg, #ffffff 0%, #fdf6e3 100%);">
   <div class="text-center">
     <div class="text-5xl mb-3">💰</div>
-    <h1 class="text-3xl font-bold" style="color:#d4af37;">Inversiones JB</h1>
+    <h1 class="text-3xl font-bold" style="color:#8a6a10;">Inversiones JB</h1>
     <p class="mt-2" style="color:#b8860b;">Conectando a la nube...</p>
   </div>
 </div>
 
 <!-- ============ PANTALLA LOGIN ============ -->
-<div id="pantalla-login" class="hidden fixed inset-0 flex items-center justify-center p-4" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1200 50%, #0a0a0a 100%);">
+<div id="pantalla-login" class="hidden fixed inset-0 flex items-center justify-center p-4" style="background: linear-gradient(135deg, #ffffff 0%, #fdf6e3 50%, #ffffff 100%);">
   <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-8" style="border-top: 4px solid #d4af37;">
     <div class="text-center mb-6">
       <div class="text-5xl mb-3">💰</div>
@@ -107,46 +111,46 @@
 <div id="app-principal" class="hidden">
 
 <!-- HEADER -->
-<header class="text-white shadow-lg no-print" style="background: linear-gradient(90deg, #0a0a0a 0%, #1a1200 50%, #0a0a0a 100%); border-bottom: 2px solid #b8860b;">
+<header class="shadow-lg no-print" style="background: linear-gradient(90deg, #ffffff 0%, #fdf6e3 50%, #ffffff 100%); border-bottom: 2px solid #b8860b;">
   <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
     <div>
-      <h1 class="text-2xl font-bold" style="color:#d4af37;">💰 Inversiones JB</h1>
+      <h1 class="text-2xl font-bold" style="color:#8a6a10;">💰 Inversiones JB</h1>
       <p class="text-xs" style="color:#b8860b;">Sistema en la Nube</p>
     </div>
     <div class="text-right">
-      <div class="text-sm font-semibold" id="user-info" style="color:#d4af37;"></div>
+      <div class="text-sm font-semibold" id="user-info" style="color:#111111;"></div>
       <div class="flex gap-2 mt-1 justify-end">
         <span id="estado-sync" class="text-xs" style="color:#b8860b;">🟢 Sincronizado</span>
         <button onclick="exportarExcel()" id="btn-export-excel" class="hidden px-2 py-1 rounded text-xs font-semibold text-black" style="background:#d4af37;">📊 Exportar Excel</button>
-        <button onclick="logout()" class="px-2 py-1 rounded text-xs" style="background:#1a1a1a;color:#d4af37;border:1px solid #b8860b;">Salir</button>
+        <button onclick="logout()" class="px-2 py-1 rounded text-xs" style="background:#ffffff;color:#111111;border:1px solid #b8860b;">Salir</button>
       </div>
     </div>
   </div>
   <nav class="max-w-7xl mx-auto px-4 pb-2 flex gap-1 flex-wrap" id="nav-tabs"></nav>
 </header>
 
-<main class="max-w-7xl mx-auto p-4" style="background:#0f0f0f; min-height:100vh;">
+<main class="max-w-7xl mx-auto p-4" style="background:#ffffff; min-height:100vh;">
 
 <!-- DASHBOARD -->
 <section id="seccion-dashboard" class="seccion">
-  <h2 class="text-2xl font-bold mb-4" style="color:#d4af37;">Dashboard General</h2>
+  <h2 class="text-2xl font-bold mb-4" style="color:#8a6a10;">Dashboard General</h2>
   <div id="kpis" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
   <div class="grid md:grid-cols-2 gap-6">
-    <div class="p-5 rounded-lg shadow" style="background:#1a1a1a;border:1px solid #333;">
-      <h3 class="font-bold text-lg mb-3" style="color:#d4af37;">⚠️ Pagos Atrasados</h3>
+    <div class="p-5 rounded-lg shadow" style="background:#ffffff;border:1px solid #d6d3d1;">
+      <h3 class="font-bold text-lg mb-3" style="color:#8a6a10;">⚠️ Pagos Atrasados</h3>
       <div id="lista-atrasados"></div>
     </div>
-    <div class="p-5 rounded-lg shadow" style="background:#1a1a1a;border:1px solid #333;">
-      <h3 class="font-bold text-lg mb-3" style="color:#d4af37;">📅 Cuotas de Hoy</h3>
+    <div class="p-5 rounded-lg shadow" style="background:#ffffff;border:1px solid #d6d3d1;">
+      <h3 class="font-bold text-lg mb-3" style="color:#8a6a10;">📅 Cuotas de Hoy</h3>
       <div id="lista-hoy"></div>
     </div>
   </div>
-  <div class="p-5 rounded-lg shadow mt-6" style="background:#1a1a1a;border:1px solid #333;">
-    <h3 class="font-bold text-lg mb-3" style="color:#d4af37;">📅 Resumen de la Semana Actual</h3>
+  <div class="p-5 rounded-lg shadow mt-6" style="background:#ffffff;border:1px solid #d6d3d1;">
+    <h3 class="font-bold text-lg mb-3" style="color:#8a6a10;">📅 Resumen de la Semana Actual</h3>
     <div id="resumen-semana"></div>
   </div>
-  <div class="p-5 rounded-lg shadow mt-6" style="background:#1a1a1a;border:1px solid #333;">
-    <h3 class="font-bold text-lg mb-3" style="color:#d4af37;">📊 Resumen del Mes Actual</h3>
+  <div class="p-5 rounded-lg shadow mt-6" style="background:#ffffff;border:1px solid #d6d3d1;">
+    <h3 class="font-bold text-lg mb-3" style="color:#8a6a10;">📊 Resumen del Mes Actual</h3>
     <div id="resumen-mes"></div>
   </div>
 </section>
@@ -154,13 +158,13 @@
 <!-- CLIENTES -->
 <section id="seccion-clientes" class="seccion hidden">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold" style="color:#d4af37;">Clientes</h2>
+    <h2 class="text-2xl font-bold" style="color:#8a6a10;">Clientes</h2>
     <button onclick="abrirModalCliente()" id="btn-nuevo-cliente" class="text-black px-4 py-2 rounded font-semibold" style="background:linear-gradient(135deg,#d4af37,#b8860b);">➕ Nuevo Cliente</button>
   </div>
-  <input type="text" id="buscar-cliente" oninput="renderClientes()" placeholder="🔍 Buscar por nombre, cédula o teléfono..." class="w-full p-2 border rounded mb-4" style="background:#1a1a1a;border-color:#333;color:#e5e5e5;" />
-  <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#1a1a1a;border:1px solid #333;">
+  <input type="text" id="buscar-cliente" oninput="renderClientes()" placeholder="🔍 Buscar por nombre, cédula o teléfono..." class="w-full p-2 border rounded mb-4" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
+  <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#ffffff;border:1px solid #d6d3d1;">
     <table class="w-full text-sm">
-      <thead style="background:#111;color:#d4af37;">
+      <thead style="background:#f7ecc8;color:#111111;">
         <tr>
           <th class="p-3 text-left">Nombre</th>
           <th class="p-3 text-left">Cédula</th>
@@ -174,39 +178,42 @@
       <tbody id="tabla-clientes"></tbody>
     </table>
   </div>
-  <div id="cierre-caja" class="mt-6 rounded-lg shadow p-5" style="background:#1a1a1a;border:1px solid #b8860b;"></div>
+  <div id="cierre-caja" class="mt-6 rounded-lg shadow p-5" style="background:#ffffff;border:1px solid #b8860b;"></div>
 </section>
 
 <!-- PRÉSTAMOS -->
 <section id="seccion-prestamos" class="seccion hidden">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold" style="color:#d4af37;">Préstamos</h2>
+    <h2 class="text-2xl font-bold" style="color:#8a6a10;">Préstamos</h2>
     <button onclick="abrirModalPrestamo()" id="btn-nuevo-prestamo" class="text-black px-4 py-2 rounded font-semibold" style="background:linear-gradient(135deg,#d4af37,#b8860b);">➕ Nuevo Préstamo</button>
   </div>
   <div class="mb-3">
-    <input type="text" id="buscar-prestamo" oninput="renderPrestamos()" placeholder="🔍 Buscar por nombre de cliente..." class="w-full p-2 border rounded shadow-sm" style="background:#1a1a1a;border-color:#333;color:#e5e5e5;" />
+    <input type="text" id="buscar-prestamo" oninput="renderPrestamos()" placeholder="🔍 Buscar por nombre de cliente..." class="w-full p-2 border rounded shadow-sm" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
   </div>
   <div class="flex gap-2 mb-2 flex-wrap items-center">
-    <span class="text-sm font-semibold" style="color:#d4af37;">Estado:</span>
-    <button onclick="setFiltroEstado('todos')" id="fp-todos" class="filtro-btn activo px-3 py-1 rounded text-sm font-semibold" style="background:#333;color:#d4af37;">Todos</button>
-    <button onclick="setFiltroEstado('activo')" id="fp-activo" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">Activos</button>
-    <button onclick="setFiltroEstado('mora')" id="fp-mora" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">En Mora</button>
+    <span class="text-sm font-semibold" style="color:#111111;">Estado:</span>
+    <button onclick="setFiltroEstado('todos')" id="fp-todos" class="filtro-btn activo px-3 py-1 rounded text-sm font-semibold" style="background:#d6d3d1;color:#111111;">Todos</button>
+    <button onclick="setFiltroEstado('activo')" id="fp-activo" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">Activos</button>
+    <button onclick="setFiltroEstado('mora')" id="fp-mora" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">En Mora</button>
   </div>
   <div class="flex gap-2 mb-4 flex-wrap items-center">
-    <span class="text-sm font-semibold" style="color:#d4af37;">Tipo:</span>
-    <button onclick="setFiltroTipo('todos')" id="ft-todos" class="filtro-btn activo px-3 py-1 rounded text-sm font-semibold" style="background:#333;color:#d4af37;">Todos</button>
-    <button onclick="setFiltroTipo('diario')" id="ft-diario" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">📅 Diario</button>
-    <button onclick="setFiltroTipo('semanal')" id="ft-semanal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">📆 Semanal</button>
-    <button onclick="setFiltroTipo('quincenal')" id="ft-quincenal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">🗓️ Quincenal</button>
-    <button onclick="setFiltroTipo('clavo')" id="ft-clavo" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">📌 Clavos</button>
+    <span class="text-sm font-semibold" style="color:#111111;">Tipo:</span>
+    <button onclick="setFiltroTipo('todos')" id="ft-todos" class="filtro-btn activo px-3 py-1 rounded text-sm font-semibold" style="background:#d6d3d1;color:#111111;">Todos</button>
+    <button onclick="setFiltroTipo('diario')" id="ft-diario" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">📅 Diario</button>
+    <button onclick="setFiltroTipo('semanal')" id="ft-semanal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">📆 Semanal</button>
+    <button onclick="setFiltroTipo('quincenal')" id="ft-quincenal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">🗓️ Quincenal</button>
+    <button onclick="setFiltroTipo('clavo')" id="ft-clavo" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">📌 Clavos</button>
   </div>
-  <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#1a1a1a;border:1px solid #333;">
+  <div id="resumen-saldos-prestamos" class="mb-3 text-sm"></div>
+  <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#ffffff;border:1px solid #d6d3d1;">
     <table class="w-full text-sm">
-      <thead style="background:#111;color:#d4af37;">
+      <thead style="background:#f7ecc8;color:#111111;">
         <tr>
           <th class="p-3 text-left">Cliente</th>
           <th class="p-3 text-right">Monto</th>
           <th class="p-3 text-right">Total Pagar</th>
+          <th class="p-3 text-right">Pagado</th>
+          <th class="p-3 text-right">Saldo</th>
           <th class="p-3 text-right">Cuota</th>
           <th class="p-3 text-center">Desembolso</th>
           <th class="p-3 text-center">Vence</th>
@@ -220,12 +227,12 @@
     </table>
   </div>
   <div class="mt-2">
-    <button onclick="togglePrestamosPagados()" class="flex items-center gap-2 text-base font-bold mb-2 hover:underline" style="color:#d4af37;">
+    <button onclick="togglePrestamosPagados()" class="flex items-center gap-2 text-base font-bold mb-2 hover:underline" style="color:#111111;">
       <span id="icon-prest-pagados">▶</span> ✅ Préstamos Pagados (<span id="count-prest-pagados">0</span>)
     </button>
-    <div id="tabla-prest-pagados-wrap" class="hidden rounded-lg shadow overflow-x-auto" style="background:#1a1a1a;border:1px solid #333;">
+    <div id="tabla-prest-pagados-wrap" class="hidden rounded-lg shadow overflow-x-auto" style="background:#ffffff;border:1px solid #d6d3d1;">
       <table class="w-full text-sm">
-        <thead style="background:#0a1f0a;color:#4ade80;">
+        <thead style="background:#ecfdf3;color:#15803d;">
           <tr>
             <th class="p-3 text-left">Cliente</th>
             <th class="p-3 text-right">Monto</th>
@@ -246,27 +253,27 @@
 
 <!-- PAGOS DEL DÍA -->
 <section id="seccion-pagos" class="seccion hidden">
-  <h2 class="text-2xl font-bold mb-4" style="color:#d4af37;">Cobros Programados</h2>
+  <h2 class="text-2xl font-bold mb-4" style="color:#8a6a10;">Cobros Programados</h2>
   <div class="flex gap-2 items-center mb-3 flex-wrap">
-    <label class="font-semibold" style="color:#d4af37;">Fecha:</label>
-    <input type="date" id="fecha-pagos" onchange="renderPagos()" class="p-2 border rounded" style="background:#1a1a1a;border-color:#333;color:#e5e5e5;" />
-    <button onclick="document.getElementById('fecha-pagos').valueAsDate = new Date(); renderPagos();" class="px-3 py-2 rounded text-sm" style="background:#333;color:#d4af37;">Hoy</button>
-    <div id="resumen-dia" class="ml-auto font-semibold" style="color:#e5e5e5;"></div>
+    <label class="font-semibold" style="color:#111111;">Fecha:</label>
+    <input type="date" id="fecha-pagos" onchange="renderPagos()" class="p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
+    <button onclick="document.getElementById('fecha-pagos').valueAsDate = new Date(); renderPagos();" class="px-3 py-2 rounded text-sm" style="background:#d6d3d1;color:#111111;">Hoy</button>
+    <div id="resumen-dia" class="ml-auto font-semibold" style="color:#111111;"></div>
   </div>
   <div class="flex gap-2 mb-3 flex-wrap items-center">
-    <span class="text-sm font-semibold" style="color:#d4af37;">Tipo:</span>
-    <button onclick="setFiltroPagosTipo('todos')" id="fpt-todos" class="filtro-btn activo px-3 py-1 rounded text-sm font-semibold" style="background:#333;color:#d4af37;">Todos</button>
-    <button onclick="setFiltroPagosTipo('diario')" id="fpt-diario" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">📅 Diario</button>
-    <button onclick="setFiltroPagosTipo('semanal')" id="fpt-semanal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">📆 Semanal</button>
-    <button onclick="setFiltroPagosTipo('quincenal')" id="fpt-quincenal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">🗓️ Quincenal</button>
-    <button onclick="setFiltroPagosTipo('clavo')" id="fpt-clavo" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#1a1a1a;color:#aaa;border:1px solid #333;">📌 Clavos</button>
+    <span class="text-sm font-semibold" style="color:#111111;">Tipo:</span>
+    <button onclick="setFiltroPagosTipo('todos')" id="fpt-todos" class="filtro-btn activo px-3 py-1 rounded text-sm font-semibold" style="background:#d6d3d1;color:#111111;">Todos</button>
+    <button onclick="setFiltroPagosTipo('diario')" id="fpt-diario" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">📅 Diario</button>
+    <button onclick="setFiltroPagosTipo('semanal')" id="fpt-semanal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">📆 Semanal</button>
+    <button onclick="setFiltroPagosTipo('quincenal')" id="fpt-quincenal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">🗓️ Quincenal</button>
+    <button onclick="setFiltroPagosTipo('clavo')" id="fpt-clavo" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">📌 Clavos</button>
   </div>
   <div class="mb-4">
-    <input type="text" id="buscar-pagos" oninput="window.renderPagos()" placeholder="🔍 Buscar cliente..." class="w-full p-2 border rounded shadow-sm" style="background:#1a1a1a;border-color:#333;color:#e5e5e5;" />
+    <input type="text" id="buscar-pagos" oninput="window.renderPagos()" placeholder="🔍 Buscar cliente..." class="w-full p-2 border rounded shadow-sm" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
   </div>
-  <div class="rounded-lg shadow overflow-x-auto" style="background:#1a1a1a;border:1px solid #333;">
+  <div class="rounded-lg shadow overflow-x-auto" style="background:#ffffff;border:1px solid #d6d3d1;">
     <table class="w-full text-sm">
-      <thead style="background:#111;color:#d4af37;">
+      <thead style="background:#f7ecc8;color:#111111;">
         <tr>
           <th class="p-3 text-left">Cliente</th>
           <th class="p-3 text-left">Teléfono</th>
@@ -284,17 +291,17 @@
 <!-- GASTOS -->
 <section id="seccion-gastos" class="seccion hidden">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold" style="color:#d4af37;">Gastos y Movimientos</h2>
+    <h2 class="text-2xl font-bold" style="color:#8a6a10;">Gastos y Movimientos</h2>
     <button onclick="abrirModalGasto()" class="text-black px-4 py-2 rounded font-semibold" style="background:linear-gradient(135deg,#d4af37,#b8860b);">➕ Nuevo Movimiento</button>
   </div>
   <div class="flex gap-2 mb-4 items-center flex-wrap">
-    <label class="font-semibold" style="color:#d4af37;">Mes:</label>
-    <input type="month" id="mes-gastos" onchange="renderGastos()" class="p-2 border rounded" style="background:#1a1a1a;border-color:#333;color:#e5e5e5;" />
+    <label class="font-semibold" style="color:#111111;">Mes:</label>
+    <input type="month" id="mes-gastos" onchange="renderGastos()" class="p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
     <div id="totales-gastos" class="ml-auto flex gap-4 text-sm font-semibold"></div>
   </div>
-  <div class="rounded-lg shadow overflow-x-auto" style="background:#1a1a1a;border:1px solid #333;">
+  <div class="rounded-lg shadow overflow-x-auto" style="background:#ffffff;border:1px solid #d6d3d1;">
     <table class="w-full text-sm">
-      <thead style="background:#111;color:#d4af37;">
+      <thead style="background:#f7ecc8;color:#111111;">
         <tr>
           <th class="p-3 text-left">Fecha</th>
           <th class="p-3 text-left">Tipo</th>
@@ -311,32 +318,32 @@
 
 <!-- REPORTES -->
 <section id="seccion-reportes" class="seccion hidden">
-  <h2 class="text-2xl font-bold mb-4" style="color:#d4af37;">Reportes</h2>
+  <h2 class="text-2xl font-bold mb-4" style="color:#8a6a10;">Reportes</h2>
   <div class="grid md:grid-cols-2 gap-6">
-    <div class="p-5 rounded-lg shadow" style="background:#1a1a1a;border:1px solid #333;">
-      <h3 class="font-bold text-lg mb-3" style="color:#d4af37;">💰 Resumen Histórico</h3>
+    <div class="p-5 rounded-lg shadow" style="background:#ffffff;border:1px solid #d6d3d1;">
+      <h3 class="font-bold text-lg mb-3" style="color:#8a6a10;">💰 Resumen Histórico</h3>
       <div id="reporte-historico"></div>
     </div>
-    <div class="p-5 rounded-lg shadow" style="background:#1a1a1a;border:1px solid #333;">
-      <h3 class="font-bold text-lg mb-3" style="color:#d4af37;">📅 Ganancias por Mes</h3>
+    <div class="p-5 rounded-lg shadow" style="background:#ffffff;border:1px solid #d6d3d1;">
+      <h3 class="font-bold text-lg mb-3" style="color:#8a6a10;">📅 Ganancias por Mes</h3>
       <div id="reporte-mensual"></div>
     </div>
   </div>
-  <div class="p-5 rounded-lg shadow mt-6" style="background:#1a1a1a;border:1px solid #333;">
-    <h3 class="font-bold text-lg mb-3" style="color:#d4af37;">🏆 Top 10 Mejores Clientes</h3>
+  <div class="p-5 rounded-lg shadow mt-6" style="background:#ffffff;border:1px solid #d6d3d1;">
+    <h3 class="font-bold text-lg mb-3" style="color:#8a6a10;">🏆 Top 10 Mejores Clientes</h3>
     <div id="reporte-top"></div>
   </div>
 </section>
 
 <!-- USUARIOS -->
 <section id="seccion-usuarios" class="seccion hidden">
-  <h2 class="text-2xl font-bold mb-4" style="color:#d4af37;">Gestión de Usuarios</h2>
-  <div class="border-l-4 p-4 mb-4 text-sm rounded" style="background:#1a1200;border-color:#b8860b;color:#d4af37;">
+  <h2 class="text-2xl font-bold mb-4" style="color:#8a6a10;">Gestión de Usuarios</h2>
+  <div class="border-l-4 p-4 mb-4 text-sm rounded" style="background:#fdf6e3;border-color:#b8860b;color:#111111;">
     Para crear un nuevo usuario, usa el formulario de abajo. Tu sesión se cerrará temporalmente al crearlo.
   </div>
-  <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#1a1a1a;border:1px solid #333;">
+  <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#ffffff;border:1px solid #d6d3d1;">
     <table class="w-full text-sm">
-      <thead style="background:#111;color:#d4af37;">
+      <thead style="background:#f7ecc8;color:#111111;">
         <tr>
           <th class="p-3 text-left">Correo</th>
           <th class="p-3 text-left">Nombre</th>
@@ -347,26 +354,26 @@
       <tbody id="tabla-usuarios"></tbody>
     </table>
   </div>
-  <h3 class="font-bold text-lg mt-6 mb-3" style="color:#d4af37;">Crear Nueva Cuenta de Usuario</h3>
-  <div class="p-5 rounded-lg shadow max-w-md" style="background:#1a1a1a;border:1px solid #333;">
+  <h3 class="font-bold text-lg mt-6 mb-3" style="color:#8a6a10;">Crear Nueva Cuenta de Usuario</h3>
+  <div class="p-5 rounded-lg shadow max-w-md" style="background:#ffffff;border:1px solid #d6d3d1;">
     <form id="form-nuevo-usuario" class="space-y-3">
-      <div><label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Correo</label><input type="email" id="nuevo-user-email" required class="w-full p-2 border rounded" style="background:#111;border-color:#333;color:#e5e5e5;" /></div>
-      <div><label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Contraseña temporal (mín 6)</label><input type="password" id="nuevo-user-pass" required minlength="6" class="w-full p-2 border rounded" style="background:#111;border-color:#333;color:#e5e5e5;" /></div>
-      <div><label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Nombre</label><input type="text" id="nuevo-user-nombre" required class="w-full p-2 border rounded" style="background:#111;border-color:#333;color:#e5e5e5;" /></div>
-      <div><label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Rol</label><select id="nuevo-user-rol" class="w-full p-2 border rounded" style="background:#111;border-color:#333;color:#e5e5e5;"><option value="cobrador">Cobrador</option><option value="admin">Admin</option></select></div>
+      <div><label class="block text-sm font-semibold mb-1" style="color:#111111;">Correo</label><input type="email" id="nuevo-user-email" required class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" /></div>
+      <div><label class="block text-sm font-semibold mb-1" style="color:#111111;">Contraseña temporal (mín 6)</label><input type="password" id="nuevo-user-pass" required minlength="6" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" /></div>
+      <div><label class="block text-sm font-semibold mb-1" style="color:#111111;">Nombre</label><input type="text" id="nuevo-user-nombre" required class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" /></div>
+      <div><label class="block text-sm font-semibold mb-1" style="color:#111111;">Rol</label><select id="nuevo-user-rol" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;"><option value="cobrador">Cobrador</option><option value="admin">Admin</option></select></div>
       <button type="submit" class="text-black px-4 py-2 rounded font-semibold w-full" style="background:linear-gradient(135deg,#d4af37,#b8860b);">Crear Usuario</button>
-      <p class="text-xs" style="color:#888;">⚠️ Al crear el usuario tu sesión se cerrará. Vuelve a entrar con tu cuenta admin.</p>
+      <p class="text-xs" style="color:#555555;">⚠️ Al crear el usuario tu sesión se cerrará. Vuelve a entrar con tu cuenta admin.</p>
     </form>
   </div>
 </section>
 
 <!-- AUDITORÍA -->
 <section id="seccion-auditoria" class="seccion hidden">
-  <h2 class="text-2xl font-bold mb-4" style="color:#d4af37;">Registro de Auditoría</h2>
-  <p class="text-sm mb-4" style="color:#888;">Últimas 200 acciones realizadas en el sistema.</p>
-  <div class="rounded-lg shadow overflow-x-auto" style="background:#1a1a1a;border:1px solid #333;">
+  <h2 class="text-2xl font-bold mb-4" style="color:#8a6a10;">Registro de Auditoría</h2>
+  <p class="text-sm mb-4" style="color:#555555;">Últimas 200 acciones realizadas en el sistema.</p>
+  <div class="rounded-lg shadow overflow-x-auto" style="background:#ffffff;border:1px solid #d6d3d1;">
     <table class="w-full text-sm">
-      <thead style="background:#111;color:#d4af37;">
+      <thead style="background:#f7ecc8;color:#111111;">
         <tr>
           <th class="p-3 text-left">Fecha</th>
           <th class="p-3 text-left">Usuario</th>
@@ -381,12 +388,12 @@
 
 <!-- CONFIGURACIÓN -->
 <section id="seccion-config" class="seccion hidden">
-  <h2 class="text-2xl font-bold mb-4" style="color:#d4af37;">Configuración</h2>
-  <div class="p-5 rounded-lg shadow max-w-2xl" style="background:#1a1a1a;border:1px solid #333;">
+  <h2 class="text-2xl font-bold mb-4" style="color:#8a6a10;">Configuración</h2>
+  <div class="p-5 rounded-lg shadow max-w-2xl" style="background:#ffffff;border:1px solid #d6d3d1;">
     <form id="form-config" class="space-y-3">
-      <div><label class="block text-sm font-semibold mb-1" style="color:#d4af37;">% de interés por defecto</label><input type="number" id="cfg-interes" step="0.1" min="0" class="w-full p-2 border rounded" style="background:#111;border-color:#333;color:#e5e5e5;" /></div>
-      <div><label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Número de cuotas por defecto</label><input type="number" id="cfg-cuotas" min="1" class="w-full p-2 border rounded" style="background:#111;border-color:#333;color:#e5e5e5;" /></div>
-      <div><label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Tasa de recargo por mora (% mensual)</label><input type="number" id="cfg-mora" step="0.1" min="0" class="w-full p-2 border rounded" style="background:#111;border-color:#333;color:#e5e5e5;" /><p class="text-xs mt-1" style="color:#666;">Se aplica solo después de la fecha de vencimiento.</p></div>
+      <div><label class="block text-sm font-semibold mb-1" style="color:#111111;">% de interés por defecto</label><input type="number" id="cfg-interes" step="0.1" min="0" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" /></div>
+      <div><label class="block text-sm font-semibold mb-1" style="color:#111111;">Número de cuotas por defecto</label><input type="number" id="cfg-cuotas" min="1" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" /></div>
+      <div><label class="block text-sm font-semibold mb-1" style="color:#111111;">Tasa de recargo por mora (% mensual)</label><input type="number" id="cfg-mora" step="0.1" min="0" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" /><p class="text-xs mt-1" style="color:#555555;">Se aplica solo después de la fecha de vencimiento.</p></div>
       <button type="submit" class="text-black px-4 py-2 rounded font-semibold" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Guardar Configuración</button>
     </form>
   </div>
@@ -399,56 +406,56 @@
 
 <!-- ============ MODAL CLIENTE ============ -->
 <div id="modal-cliente" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
-  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-2xl my-4" style="border:1px solid #333;">
-    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#1a1200,#2a1f00);border-bottom:1px solid #b8860b;">
-      <h3 id="titulo-modal-cliente" class="text-xl font-bold" style="color:#d4af37;">Nuevo Cliente</h3>
+  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-2xl my-4" style="border:1px solid #d6d3d1;">
+    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#fdf6e3,#f7ecc8);border-bottom:1px solid #b8860b;">
+      <h3 id="titulo-modal-cliente" class="text-xl font-bold" style="color:#8a6a10;">Nuevo Cliente</h3>
       <button onclick="cerrarModal('modal-cliente')" class="text-2xl hover:text-red-300">×</button>
     </div>
     <form id="form-cliente" class="p-6 space-y-3">
       <input type="hidden" id="cliente-id" />
       <div class="grid md:grid-cols-2 gap-3">
         <div class="md:col-span-2">
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Nombre Completo *</label>
-          <input type="text" id="cliente-nombre" required oninput="this.value=this.value.replace(/(?:^|\s)\S/g,c=>c.toUpperCase())" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Nombre Completo *</label>
+          <input type="text" id="cliente-nombre" required oninput="this.value=this.value.replace(/(?:^|\s)\S/g,c=>c.toUpperCase())" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Cédula *</label>
-          <input type="text" id="cliente-cedula" required class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Cédula *</label>
+          <input type="text" id="cliente-cedula" required class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Teléfono *</label>
-          <input type="tel" id="cliente-telefono" required class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Teléfono *</label>
+          <input type="tel" id="cliente-telefono" required class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Teléfono Alterno</label>
-          <input type="tel" id="cliente-telefono2" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Teléfono Alterno</label>
+          <input type="tel" id="cliente-telefono2" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Dirección</label>
-          <input type="text" id="cliente-direccion" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Dirección</label>
+          <input type="text" id="cliente-direccion" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Ocupación / Negocio</label>
-        <input type="text" id="cliente-ocupacion" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Ocupación / Negocio</label>
+        <input type="text" id="cliente-ocupacion" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Referencias</label>
-        <textarea id="cliente-referencias" rows="2" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;"></textarea>
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Referencias</label>
+        <textarea id="cliente-referencias" rows="2" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;"></textarea>
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Notas / Observaciones</label>
-        <textarea id="cliente-notas" rows="2" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;"></textarea>
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Notas / Observaciones</label>
+        <textarea id="cliente-notas" rows="2" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;"></textarea>
       </div>
-      <div class="rounded p-3 flex items-center gap-3" style="background:#2a0a0a;border:1px solid #7f1d1d;">
+      <div class="rounded p-3 flex items-center gap-3" style="background:#fef2f2;border:1px solid #7f1d1d;">
         <input type="checkbox" id="cliente-clavo" class="w-5 h-5 accent-red-600" />
         <div>
-          <label for="cliente-clavo" class="text-sm font-semibold cursor-pointer" style="color:#f87171;">📌 Marcar como Clavo</label>
-          <p class="text-xs" style="color:#9b4444;">Cliente con dificultad de pago</p>
+          <label for="cliente-clavo" class="text-sm font-semibold cursor-pointer" style="color:#b91c1c;">📌 Marcar como Clavo</label>
+          <p class="text-xs" style="color:#b91c1c;">Cliente con dificultad de pago</p>
         </div>
       </div>
-      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #333;">
-        <button type="button" onclick="cerrarModal('modal-cliente')" class="px-4 py-2 rounded" style="background:#333;color:#aaa;">Cancelar</button>
+      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #d6d3d1;">
+        <button type="button" onclick="cerrarModal('modal-cliente')" class="px-4 py-2 rounded" style="background:#d6d3d1;color:#444444;">Cancelar</button>
         <button type="submit" class="px-4 py-2 rounded font-semibold text-black" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Guardar</button>
       </div>
     </form>
@@ -457,45 +464,45 @@
 
 <!-- ============ MODAL PRÉSTAMO ============ -->
 <div id="modal-prestamo" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
-  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-2xl my-4" style="border:1px solid #333;">
-    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#0a2a0a,#143314);border-bottom:1px solid #166534;">
-      <h3 class="text-xl font-bold" style="color:#4ade80;">💵 Nuevo Préstamo</h3>
-      <button onclick="cerrarModal('modal-prestamo')" class="text-2xl" style="color:#aaa;">×</button>
+  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-2xl my-4" style="border:1px solid #d6d3d1;">
+    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#ecfdf3,#d1fae5);border-bottom:1px solid #166534;">
+      <h3 class="text-xl font-bold" style="color:#15803d;">💵 Nuevo Préstamo</h3>
+      <button onclick="cerrarModal('modal-prestamo')" class="text-2xl" style="color:#444444;">×</button>
     </div>
     <!-- Cliente rápido -->
     <div class="px-6 pt-4">
       <div class="flex justify-between items-center mb-1">
-        <label class="block text-sm font-semibold" style="color:#d4af37;">Cliente *</label>
+        <label class="block text-sm font-semibold" style="color:#111111;">Cliente *</label>
         <button type="button" onclick="abrirClienteRapido()" class="text-xs px-2 py-1 rounded text-black font-semibold" style="background:#d4af37;">➕ Nuevo Cliente</button>
       </div>
-      <select id="prestamo-cliente" required class="w-full p-2 border rounded mb-2" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;">
+      <select id="prestamo-cliente" required class="w-full p-2 border rounded mb-2" style="background:#ffffff;border-color:#d6d3d1;color:#111111;">
         <option value="">-- Selecciona --</option>
       </select>
-      <div id="cliente-rapido" class="hidden rounded p-4 space-y-2 mb-2" style="background:#111;border:1px solid #b8860b;">
-        <p class="text-sm font-semibold" style="color:#d4af37;">📋 Crear cliente rápido</p>
+      <div id="cliente-rapido" class="hidden rounded p-4 space-y-2 mb-2" style="background:#ffffff;border:1px solid #b8860b;">
+        <p class="text-sm font-semibold" style="color:#111111;">📋 Crear cliente rápido</p>
         <div>
-          <label class="block text-xs font-semibold mb-1" style="color:#d4af37;">Nombre *</label>
-          <input type="text" id="cr-nombre" oninput="this.value=this.value.replace(/(?:^|\s)\S/g,c=>c.toUpperCase())" class="w-full p-2 border rounded text-sm" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-xs font-semibold mb-1" style="color:#111111;">Nombre *</label>
+          <input type="text" id="cr-nombre" oninput="this.value=this.value.replace(/(?:^|\s)\S/g,c=>c.toUpperCase())" class="w-full p-2 border rounded text-sm" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
         <div class="flex gap-2 justify-end">
-          <button type="button" onclick="cerrarClienteRapido()" class="px-3 py-1 rounded text-sm" style="background:#333;color:#aaa;">Cancelar</button>
+          <button type="button" onclick="cerrarClienteRapido()" class="px-3 py-1 rounded text-sm" style="background:#d6d3d1;color:#444444;">Cancelar</button>
           <button type="button" onclick="guardarClienteRapido()" class="px-3 py-1 rounded text-sm font-semibold text-black" style="background:#d4af37;">💾 Guardar y Seleccionar</button>
         </div>
       </div>
     </div>
     <form id="form-prestamo" class="px-6 pb-6 space-y-3">
       <div class="mb-1">
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Tipo de Cobro *</label>
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Tipo de Cobro *</label>
         <div class="flex gap-2 flex-wrap">
-          <label class="flex items-center gap-2 cursor-pointer border rounded px-3 py-2 flex-1" style="border-color:#333;background:#1e1e1e;color:#e5e5e5;">
+          <label class="flex items-center gap-2 cursor-pointer border rounded px-3 py-2 flex-1" style="border-color:#d6d3d1;background:#ffffff;color:#111111;">
             <input type="radio" name="prestamo-tipo-cobro" id="tipo-diario" value="diario" checked onchange="calcularPreview()" class="accent-yellow-500" />
             <span class="text-sm">📅 Diario</span>
           </label>
-          <label class="flex items-center gap-2 cursor-pointer border rounded px-3 py-2 flex-1" style="border-color:#333;background:#1e1e1e;color:#e5e5e5;">
+          <label class="flex items-center gap-2 cursor-pointer border rounded px-3 py-2 flex-1" style="border-color:#d6d3d1;background:#ffffff;color:#111111;">
             <input type="radio" name="prestamo-tipo-cobro" id="tipo-semanal" value="semanal" onchange="calcularPreview()" class="accent-yellow-500" />
             <span class="text-sm">📆 Semanal</span>
           </label>
-          <label class="flex items-center gap-2 cursor-pointer border rounded px-3 py-2 flex-1" style="border-color:#333;background:#1e1e1e;color:#e5e5e5;">
+          <label class="flex items-center gap-2 cursor-pointer border rounded px-3 py-2 flex-1" style="border-color:#d6d3d1;background:#ffffff;color:#111111;">
             <input type="radio" name="prestamo-tipo-cobro" id="tipo-quincenal" value="quincenal" onchange="calcularPreview()" class="accent-yellow-500" />
             <span class="text-sm">🗓️ Quincenal</span>
           </label>
@@ -503,46 +510,46 @@
       </div>
       <div class="grid md:grid-cols-2 gap-3">
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Monto *</label>
-          <input type="number" id="prestamo-monto" required min="1000" step="1000" oninput="calcularDesde('porciento')" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Monto *</label>
+          <input type="number" id="prestamo-monto" required min="1000" step="1000" oninput="calcularDesde('porciento')" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Fecha Desembolso *</label>
-          <input type="date" id="prestamo-fecha" required oninput="calcularPreview()" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Fecha Desembolso *</label>
+          <input type="date" id="prestamo-fecha" required oninput="calcularPreview()" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Interés en $</label>
-          <input type="number" id="prestamo-interes-pesos" min="0" step="1000" oninput="calcularDesde('pesos')" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" placeholder="Valor en pesos" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Interés en $</label>
+          <input type="number" id="prestamo-interes-pesos" min="0" step="1000" oninput="calcularDesde('pesos')" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" placeholder="Valor en pesos" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Interés en %</label>
-          <input type="number" id="prestamo-interes" min="0" step="any" oninput="calcularDesde('porciento')" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" placeholder="Porcentaje" />
+          <label class="block text-sm font-semibold mb-1" style="color:#111111;">Interés en %</label>
+          <input type="number" id="prestamo-interes" min="0" step="any" oninput="calcularDesde('porciento')" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" placeholder="Porcentaje" />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1" id="label-cuotas" style="color:#d4af37;">Cuotas</label>
-          <input type="number" id="prestamo-cuotas" required min="1" oninput="calcularPreview()" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+          <label class="block text-sm font-semibold mb-1" id="label-cuotas" style="color:#111111;">Cuotas</label>
+          <input type="number" id="prestamo-cuotas" required min="1" oninput="calcularPreview()" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
         </div>
       </div>
-      <div id="preview-prestamo" class="p-3 rounded border text-sm space-y-1" style="background:#111;border-color:#b8860b;color:#d4af37;"></div>
+      <div id="preview-prestamo" class="p-3 rounded border text-sm space-y-1" style="background:#ffffff;border-color:#b8860b;color:#111111;"></div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Notas</label>
-        <textarea id="prestamo-notas" rows="2" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;"></textarea>
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Notas</label>
+        <textarea id="prestamo-notas" rows="2" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;"></textarea>
       </div>
-      <div class="rounded p-3 flex items-center justify-between" style="background:#2a0a0a;border:1px solid #7f1d1d;">
+      <div class="rounded p-3 flex items-center justify-between" style="background:#fef2f2;border:1px solid #7f1d1d;">
         <div>
-          <label for="prestamo-clavo" class="text-sm font-semibold cursor-pointer" style="color:#f87171;">📌 Marcar cliente como Clavo</label>
-          <p class="text-xs" style="color:#9b4444;">Cliente con dificultad de pago</p>
+          <label for="prestamo-clavo" class="text-sm font-semibold cursor-pointer" style="color:#b91c1c;">📌 Marcar cliente como Clavo</label>
+          <p class="text-xs" style="color:#b91c1c;">Cliente con dificultad de pago</p>
         </div>
         <input type="checkbox" id="prestamo-clavo" class="w-5 h-5 accent-red-600" />
       </div>
-      <div class="rounded p-3 flex items-center gap-2" style="background:#0a2a0a;border:1px solid #166534;">
+      <div class="rounded p-3 flex items-center gap-2" style="background:#ecfdf3;border:1px solid #166534;">
         <input type="checkbox" id="prestamo-primera-cuota" checked class="w-4 h-4 accent-green-500" />
-        <label for="prestamo-primera-cuota" class="text-sm cursor-pointer" style="color:#4ade80;">
+        <label for="prestamo-primera-cuota" class="text-sm cursor-pointer" style="color:#15803d;">
           💵 Registrar primera cuota como pagada al desembolso
         </label>
       </div>
-      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #333;">
-        <button type="button" onclick="cerrarModal('modal-prestamo')" class="px-4 py-2 rounded" style="background:#333;color:#aaa;">Cancelar</button>
+      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #d6d3d1;">
+        <button type="button" onclick="cerrarModal('modal-prestamo')" class="px-4 py-2 rounded" style="background:#d6d3d1;color:#444444;">Cancelar</button>
         <button type="submit" class="px-4 py-2 rounded font-semibold text-black" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Crear Préstamo</button>
       </div>
     </form>
@@ -551,16 +558,16 @@
 
 <!-- ============ MODAL GASTO ============ -->
 <div id="modal-gasto" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
-  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-md my-4" style="border:1px solid #333;">
-    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#1a0a00,#2a1400);border-bottom:1px solid #c2410c;">
-      <h3 class="text-xl font-bold" style="color:#fb923c;">💸 Nuevo Movimiento</h3>
-      <button onclick="cerrarModal('modal-gasto')" class="text-2xl" style="color:#aaa;">×</button>
+  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-md my-4" style="border:1px solid #d6d3d1;">
+    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border-bottom:1px solid #c2410c;">
+      <h3 class="text-xl font-bold" style="color:#c2410c;">💸 Nuevo Movimiento</h3>
+      <button onclick="cerrarModal('modal-gasto')" class="text-2xl" style="color:#444444;">×</button>
     </div>
     <form id="form-gasto" class="p-6 space-y-3">
       <input type="hidden" id="gasto-id" />
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Tipo *</label>
-        <select id="gasto-tipo" required class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;">
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Tipo *</label>
+        <select id="gasto-tipo" required class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;">
           <option value="gasto">💸 Gasto del Negocio</option>
           <option value="retiro">🏦 Retiro Personal</option>
           <option value="ingreso">💰 Ingreso Externo</option>
@@ -569,23 +576,23 @@
         </select>
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Fecha *</label>
-        <input type="date" id="gasto-fecha" required class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Fecha *</label>
+        <input type="date" id="gasto-fecha" required class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Categoría</label>
-        <input type="text" id="gasto-categoria" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Categoría</label>
+        <input type="text" id="gasto-categoria" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Descripción</label>
-        <input type="text" id="gasto-descripcion" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Descripción</label>
+        <input type="text" id="gasto-descripcion" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Monto *</label>
-        <input type="number" id="gasto-monto" required min="0" step="100" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Monto *</label>
+        <input type="number" id="gasto-monto" required min="0" step="100" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
       </div>
-      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #333;">
-        <button type="button" onclick="cerrarModal('modal-gasto')" class="px-4 py-2 rounded" style="background:#333;color:#aaa;">Cancelar</button>
+      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #d6d3d1;">
+        <button type="button" onclick="cerrarModal('modal-gasto')" class="px-4 py-2 rounded" style="background:#d6d3d1;color:#444444;">Cancelar</button>
         <button type="submit" class="px-4 py-2 rounded font-semibold text-black" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Guardar</button>
       </div>
     </form>
@@ -594,45 +601,45 @@
 
 <!-- ============ MODAL PAGO ============ -->
 <div id="modal-pago" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
-  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-md my-4" style="border:1px solid #333;">
-    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#0a2a0a,#143314);border-bottom:1px solid #166534;">
-      <h3 class="text-xl font-bold" style="color:#4ade80;">💰 Registrar Pago</h3>
-      <button onclick="cerrarModal('modal-pago')" class="text-2xl hover:text-red-300" style="color:#aaa;">×</button>
+  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-md my-4" style="border:1px solid #d6d3d1;">
+    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#ecfdf3,#d1fae5);border-bottom:1px solid #166534;">
+      <h3 class="text-xl font-bold" style="color:#15803d;">💰 Registrar Pago</h3>
+      <button onclick="cerrarModal('modal-pago')" class="text-2xl hover:text-red-300" style="color:#444444;">×</button>
     </div>
     <form id="form-pago" class="p-6 space-y-3">
       <input type="hidden" id="pago-prestamo-id" />
       <input type="hidden" id="pago-cuota-num" />
-      <div id="pago-info" class="p-3 rounded border text-sm" style="background:#111;border-color:#333;color:#d4af37;"></div>
+      <div id="pago-info" class="p-3 rounded border text-sm" style="background:#ffffff;border-color:#d6d3d1;color:#111111;"></div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Estado *</label>
-        <select id="pago-estado" required onchange="cambioEstadoPago()" class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;">
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Estado *</label>
+        <select id="pago-estado" required onchange="cambioEstadoPago()" class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;">
           <option value="pagado">✅ Pagó completo</option>
           <option value="parcial">⚠️ Pago parcial</option>
           <option value="no_pago">❌ No pagó</option>
           <option value="anular">🔄 Anular pago</option>
         </select>
       </div>
-      <div id="pago-anular-warn" class="hidden p-3 rounded text-sm" style="background:#2a0a0a;border:1px solid #991b1b;color:#f87171;">
+      <div id="pago-anular-warn" class="hidden p-3 rounded text-sm" style="background:#fef2f2;border:1px solid #991b1b;color:#b91c1c;">
         ⚠️ Esto borrará el pago y dejará la cuota como <strong>pendiente</strong>.
       </div>
       <div id="pago-fecha-wrap">
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">📅 Fecha de Pago *</label>
-        <input type="date" id="pago-fecha" required class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;" />
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">📅 Fecha de Pago *</label>
+        <input type="date" id="pago-fecha" required class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;" />
       </div>
       <div id="pago-monto-wrap">
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">💵 Monto recibido *</label>
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">💵 Monto recibido *</label>
         <div class="flex gap-2 items-center">
-          <input type="number" id="pago-monto" required min="0" step="100" oninput="detectarPagoParcial()" class="w-full p-2 rounded text-lg font-bold" style="background:#1e1e1e;border:2px solid #d4af37;color:#d4af37;" />
-          <button type="button" id="btn-monto-exacto" onclick="usarMontoExacto()" class="px-3 py-2 rounded text-xs font-semibold whitespace-nowrap" style="background:#1a1200;border:1px solid #b8860b;color:#d4af37;">Usar cuota</button>
+          <input type="number" id="pago-monto" required min="0" step="100" oninput="detectarPagoParcial()" class="w-full p-2 rounded text-lg font-bold" style="background:#ffffff;border:2px solid #d4af37;color:#111111;" />
+          <button type="button" id="btn-monto-exacto" onclick="usarMontoExacto()" class="px-3 py-2 rounded text-xs font-semibold whitespace-nowrap" style="background:#fdf6e3;border:1px solid #b8860b;color:#111111;">Usar cuota</button>
         </div>
-        <p id="pago-monto-hint" class="text-xs mt-1" style="color:#888;"></p>
+        <p id="pago-monto-hint" class="text-xs mt-1" style="color:#555555;"></p>
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1" style="color:#d4af37;">Nota / Observación</label>
-        <textarea id="pago-nota" rows="2" placeholder="Ej: prometió pagar mañana..." class="w-full p-2 border rounded" style="background:#1e1e1e;border-color:#333;color:#e5e5e5;"></textarea>
+        <label class="block text-sm font-semibold mb-1" style="color:#111111;">Nota / Observación</label>
+        <textarea id="pago-nota" rows="2" placeholder="Ej: prometió pagar mañana..." class="w-full p-2 border rounded" style="background:#ffffff;border-color:#d6d3d1;color:#111111;"></textarea>
       </div>
-      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #333;">
-        <button type="button" onclick="cerrarModal('modal-pago')" class="px-4 py-2 rounded" style="background:#333;color:#aaa;">Cancelar</button>
+      <div class="flex gap-2 justify-end pt-3" style="border-top:1px solid #d6d3d1;">
+        <button type="button" onclick="cerrarModal('modal-pago')" class="px-4 py-2 rounded" style="background:#d6d3d1;color:#444444;">Cancelar</button>
         <button type="submit" class="px-4 py-2 rounded font-semibold text-black" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Registrar</button>
       </div>
     </form>
@@ -641,26 +648,26 @@
 
 <!-- ============ MODAL DESGLOSE ============ -->
 <div id="modal-desglose" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
-  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto my-4" style="border:1px solid #333;">
-    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#1a1200,#2a1f00);border-bottom:1px solid #b8860b;">
-      <h3 id="desglose-titulo" class="text-xl font-bold" style="color:#d4af37;">Desglose</h3>
-      <button onclick="cerrarModal('modal-desglose')" class="text-2xl hover:text-red-300" style="color:#aaa;">×</button>
+  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto my-4" style="border:1px solid #d6d3d1;">
+    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:linear-gradient(135deg,#fdf6e3,#f7ecc8);border-bottom:1px solid #b8860b;">
+      <h3 id="desglose-titulo" class="text-xl font-bold" style="color:#8a6a10;">Desglose</h3>
+      <button onclick="cerrarModal('modal-desglose')" class="text-2xl hover:text-red-300" style="color:#444444;">×</button>
     </div>
-    <div id="desglose-contenido" class="p-6" style="color:#e5e5e5;"></div>
+    <div id="desglose-contenido" class="p-6" style="color:#111111;"></div>
   </div>
 </div>
 
 <!-- ============ MODAL DETALLE ============ -->
-<div id="modal-detalle" class="hidden" style="position:fixed;inset:0;background:#0a0a0a;z-index:9998;overflow-y:auto;">
+<div id="modal-detalle" class="hidden" style="position:fixed;inset:0;background:#ffffff;z-index:9998;overflow-y:auto;">
   <div class="w-full max-w-4xl mx-auto">
-    <div class="p-4 flex justify-between items-center no-print sticky top-0 z-10" style="background:linear-gradient(135deg,#1a1200,#2a1f00);border-bottom:2px solid #b8860b;">
-      <h3 class="text-xl font-bold" style="color:#d4af37;">Detalle del Préstamo</h3>
+    <div class="p-4 flex justify-between items-center no-print sticky top-0 z-10" style="background:linear-gradient(135deg,#fdf6e3,#f7ecc8);border-bottom:2px solid #b8860b;">
+      <h3 class="text-xl font-bold" style="color:#8a6a10;">Detalle del Préstamo</h3>
       <div class="flex gap-2">
         <button onclick="window.print()" class="px-3 py-1 rounded text-sm font-semibold text-black" style="background:#d4af37;">🖨️ Imprimir</button>
-        <button onclick="cerrarModal('modal-detalle'); window._detallePrestamoActivo=null;" class="text-2xl ml-2" style="color:#aaa;">×</button>
+        <button onclick="cerrarModal('modal-detalle'); window._detallePrestamoActivo=null;" class="text-2xl ml-2" style="color:#444444;">×</button>
       </div>
     </div>
-    <div id="contenido-detalle" class="p-6" style="color:#e5e5e5;"></div>
+    <div id="contenido-detalle" class="p-6" style="color:#111111;"></div>
   </div>
 </div>
 
@@ -1187,10 +1194,10 @@ function badgeEstado(e) {
   return '<span class="badge-activo">Activo</span>';
 }
 function badgeEstadoCuota(e) {
-  if(e==='pagado')  return '<span style="color:#4ade80;font-weight:700;">✓ Pagado</span>';
-  if(e==='parcial') return '<span style="color:#fbbf24;font-weight:700;">⚠ Parcial</span>';
-  if(e==='no_pago') return '<span style="color:#f87171;font-weight:700;">✗ No pagó</span>';
-  return '<span style="color:#888;">Pendiente</span>';
+  if(e==='pagado')  return '<span style="color:#15803d;font-weight:700;">✓ Pagado</span>';
+  if(e==='parcial') return '<span style="color:#b45309;font-weight:700;">⚠ Parcial</span>';
+  if(e==='no_pago') return '<span style="color:#b91c1c;font-weight:700;">✗ No pagó</span>';
+  return '<span style="color:#555555;">Pendiente</span>';
 }
 
 window.renderPrestamos = function() {
@@ -1211,10 +1218,13 @@ window.renderPrestamos = function() {
     const pag=(p.cuotas||[]).filter(c=>c.estado==='pagado').length;
     const pct=Math.round((pag/(p.cuotas?.length||1))*100);
     const mora=calcularMora(p);
+    mora.pagado=(p.cuotas||[]).reduce((s,c)=>s+(c.montoPagado||0),0);
     return `<tr class="border-b hover:bg-slate-50 ${p.clavo?'bg-red-50':''}">
       <td class="p-3 font-semibold">${cli?cli.nombre:'?'}${p.clavo?' <span class="text-xs text-red-600">📌</span>':''}${p.tipoCobro==='semanal'?' <span class="text-xs text-purple-600">📆</span>':p.tipoCobro==='quincenal'?' <span class="text-xs text-orange-600">🗓️</span>':''}</td>
       <td class="p-3 text-right">${fmt(p.monto)}</td>
       <td class="p-3 text-right">${fmt(p.totalAPagar)}</td>
+      <td class="p-3 text-right" style="color:#15803d;">${fmt(mora.pagado)}</td>
+      <td class="p-3 text-right"><span style="color:#b91c1c;font-weight:800;">${fmt(mora.saldo)}</span>${mora.recargo>0?`<div class="text-xs" style="color:#b91c1c;">+ mora ${fmt(mora.recargo)}</div>`:''}</td>
       <td class="p-3 text-right">${fmt(p.cuotaDiaria)}</td>
       <td class="p-3 text-center text-xs">${fechaBonita(p.fechaDesembolso)}</td>
       <td class="p-3 text-center text-xs">${fechaBonita(p.fechaVence)}</td>
@@ -1222,14 +1232,19 @@ window.renderPrestamos = function() {
       <td class="p-3 text-center text-xs ${mora.diasMora>0?'text-red-700 font-bold':'text-slate-400'}">${mora.diasMora>0?mora.diasMora+'d':'-'}</td>
       <td class="p-3 text-center">${badgeEstado(p.estado)}</td>
       <td class="p-3 text-center">
-        <button onclick="verDetallePrestamo('${p.id}')" style="color:#60a5fa;font-size:12px;background:none;border:none;cursor:pointer;margin-right:4px;">👁️ Ver</button>
+        <button onclick="verDetallePrestamo('${p.id}')" style="color:#1d4ed8;font-size:12px;background:none;border:none;cursor:pointer;margin-right:4px;">👁️ Ver</button>
         <button onclick="toggleClavoDesdeDetalle('${p.clienteId}','${p.id}',${p.clavo||false})" style="font-size:12px;background:none;border:none;cursor:pointer;margin-right:4px;" title="${p.clavo?'Quitar Clavo':'Marcar Clavo'}">${p.clavo?'✅📌':'📌'}</button>
-        ${esAdmin?`<button onclick="eliminarPrestamo('${p.id}')" style="color:#f87171;font-size:12px;background:none;border:none;cursor:pointer;">🗑️</button>`:''}
+        ${esAdmin?`<button onclick="eliminarPrestamo('${p.id}')" style="color:#b91c1c;font-size:12px;background:none;border:none;cursor:pointer;">🗑️</button>`:''}
       </td>
     </tr>`;
   };
 
-  tbody.innerHTML=activos.length===0?'<tr><td colspan="10" class="p-8 text-center text-slate-400">Sin préstamos activos</td></tr>':activos.map(filaActivo).join('');
+  tbody.innerHTML=activos.length===0?'<tr><td colspan="12" class="p-8 text-center text-slate-400">Sin préstamos activos</td></tr>':activos.map(filaActivo).join('');
+  const resSal=document.getElementById('resumen-saldos-prestamos');
+  if(resSal){
+    const totSaldo=activos.reduce((s,p)=>s+calcularMora(p).saldo,0);
+    resSal.innerHTML=activos.length?`<span class="inline-block px-3 py-2 rounded" style="background:#fdf6e3;border:1px solid #b8860b;color:#111111;">💰 Saldo por cobrar (${activos.length} préstamo${activos.length===1?'':'s'}): <strong style="color:#b91c1c;">${fmt(totSaldo)}</strong></span>`:'';
+  }
   document.getElementById('count-prest-pagados').textContent=pagados.length;
   if(tbodyPag) {
     tbodyPag.innerHTML=pagados.length===0?'<tr><td colspan="9" class="p-8 text-center text-slate-400">Sin préstamos pagados</td></tr>':
@@ -1348,60 +1363,60 @@ window.verDetallePrestamo = function(id) {
     <div style="font-size:13px;color:#475569;">Estado de Cuenta — Generado el ${fechaImpresion}</div>
   </div>
   <div class="grid md:grid-cols-2 gap-4 mb-4 text-sm">
-    <div style="color:#e5e5e5;">
-      <strong style="color:#d4af37;font-size:16px;">${cli?cli.nombre:'?'}</strong>
-      ${esClavo?' <span style="color:#f87171;font-weight:700;">📌 Clavo</span>':''}
+    <div style="color:#111111;">
+      <strong style="color:#111111;font-size:16px;">${cli?cli.nombre:'?'}</strong>
+      ${esClavo?' <span style="color:#b91c1c;font-weight:700;">📌 Clavo</span>':''}
       <br>Cédula: ${cli?cli.cedula:'-'}<br>Teléfono: ${cli?cli.telefono:'-'}${cli?.direccion?'<br>Dirección: '+cli.direccion:''}
       <br><br>
       <button onclick="toggleClavoDesdeDetalle('${p.clienteId}','${p.id}',${esClavo})"
-        style="background:${esClavo?'#2a0a0a':'#1a1200'};border:1px solid ${esClavo?'#991b1b':'#b8860b'};
-        color:${esClavo?'#f87171':'#d4af37'};padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">
+        style="background:${esClavo?'#fef2f2':'#fdf6e3'};border:1px solid ${esClavo?'#991b1b':'#b8860b'};
+        color:${esClavo?'#b91c1c':'#8a6a10'};padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">
         ${esClavo?'✅ Quitar Clavo':'📌 Marcar como Clavo'}
       </button>
     </div>
-    <div style="color:#e5e5e5;">Tipo: <strong style="color:#d4af37;">${p.tipoCobro==='semanal'?'Semanal':p.tipoCobro==='quincenal'?'Quincenal':'Diario'}</strong><br>Desembolso: ${fechaBonita(p.fechaDesembolso)}<br>Vence: ${fechaBonita(p.fechaVence)}<br>Estado: ${badgeEstado(estadoP)}</div>
+    <div style="color:#111111;">Tipo: <strong style="color:#111111;">${p.tipoCobro==='semanal'?'Semanal':p.tipoCobro==='quincenal'?'Quincenal':'Diario'}</strong><br>Desembolso: ${fechaBonita(p.fechaDesembolso)}<br>Vence: ${fechaBonita(p.fechaVence)}<br>Estado: ${badgeEstado(estadoP)}</div>
   </div>
   <div class="grid grid-cols-4 gap-2 mb-4">
-    <div style="background:#0a1a2a;border:1px solid #1e40af;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#60a5fa;">Capital Prestado</div><div style="font-weight:800;color:#93c5fd;font-size:16px;">${fmt(p.monto)}</div></div>
-    <div style="background:#1a0a2a;border:1px solid #6b21a8;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#c084fc;">Total a Pagar</div><div style="font-weight:800;color:#d8b4fe;font-size:16px;">${fmt(p.totalAPagar)}</div></div>
-    <div style="background:#0a2a0a;border:1px solid #166534;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#4ade80;">Total Pagado</div><div style="font-weight:800;color:#86efac;font-size:16px;">${fmt(totalPag)}</div></div>
-    <div style="background:#2a1a00;border:1px solid #b8860b;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#d4af37;">Saldo Pendiente</div><div style="font-weight:800;color:#fcd34d;font-size:16px;">${fmt(mora.saldo)}</div></div>
+    <div style="background:#eff6ff;border:1px solid #1e40af;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#1d4ed8;">Capital Prestado</div><div style="font-weight:800;color:#1e40af;font-size:16px;">${fmt(p.monto)}</div></div>
+    <div style="background:#faf5ff;border:1px solid #6b21a8;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#7e22ce;">Total a Pagar</div><div style="font-weight:800;color:#6b21a8;font-size:16px;">${fmt(p.totalAPagar)}</div></div>
+    <div style="background:#ecfdf3;border:1px solid #166534;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#15803d;">Total Pagado</div><div style="font-weight:800;color:#166534;font-size:16px;">${fmt(totalPag)}</div></div>
+    <div style="background:#fdf6e3;border:1px solid #b8860b;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#111111;">Saldo Pendiente</div><div style="font-weight:800;color:#92400e;font-size:16px;">${fmt(mora.saldo)}</div></div>
   </div>`;
-  if(mora.recargo>0) html+=`<div style="background:#2a0a0a;border-left:4px solid #dc2626;padding:12px;margin-bottom:16px;border-radius:4px;"><div style="font-weight:700;color:#f87171;">⚠ Este préstamo está en mora</div></div>`;
-  html+=`<h4 style="font-weight:700;margin-bottom:8px;color:#d4af37;">Tabla de Cuotas</h4>
+  if(mora.recargo>0) html+=`<div style="background:#fef2f2;border-left:4px solid #dc2626;padding:12px;margin-bottom:16px;border-radius:4px;"><div style="font-weight:700;color:#b91c1c;">⚠ Este préstamo está en mora</div></div>`;
+  html+=`<h4 style="font-weight:700;margin-bottom:8px;color:#111111;">Tabla de Cuotas</h4>
     <table style="width:100%;border-collapse:collapse;font-size:12px;">
       <thead>
-        <tr style="background:#1a1200;color:#d4af37;">
-          <th style="padding:8px;text-align:left;border-bottom:1px solid #333;">#</th>
-          <th style="padding:8px;text-align:left;border-bottom:1px solid #333;">Fecha Programada</th>
-          <th style="padding:8px;text-align:right;border-bottom:1px solid #333;">Monto Cuota</th>
-          <th style="padding:8px;text-align:right;border-bottom:1px solid #333;">Monto Pagado</th>
-          <th style="padding:8px;text-align:center;border-bottom:1px solid #333;">Estado</th>
-          <th style="padding:8px;text-align:center;border-bottom:1px solid #333;">Fecha de Pago</th>
-          <th style="padding:8px;col-print-hide text-align:left;border-bottom:1px solid #333;" class="col-print-hide">Registró</th>
-          <th style="padding:8px;text-align:left;border-bottom:1px solid #333;">Nota</th>
-          <th style="padding:8px;border-bottom:1px solid #333;" class="no-print">Acción</th>
+        <tr style="background:#fdf6e3;color:#111111;">
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #d6d3d1;">#</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #d6d3d1;">Fecha Programada</th>
+          <th style="padding:8px;text-align:right;border-bottom:1px solid #d6d3d1;">Monto Cuota</th>
+          <th style="padding:8px;text-align:right;border-bottom:1px solid #d6d3d1;">Monto Pagado</th>
+          <th style="padding:8px;text-align:center;border-bottom:1px solid #d6d3d1;">Estado</th>
+          <th style="padding:8px;text-align:center;border-bottom:1px solid #d6d3d1;">Fecha de Pago</th>
+          <th style="padding:8px;col-print-hide text-align:left;border-bottom:1px solid #d6d3d1;" class="col-print-hide">Registró</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #d6d3d1;">Nota</th>
+          <th style="padding:8px;border-bottom:1px solid #d6d3d1;" class="no-print">Acción</th>
         </tr>
       </thead>
       <tbody>`;
   (p.cuotas||[]).forEach(c=>{
     const vencido = c.estado!=='pagado' && parseFecha(c.fecha)<hoyD;
     const esHoy = c.fecha===hoy();
-    const bg = c.estado==='pagado' ? '#0a2a0a' : vencido ? '#2a0a0a' : esHoy ? '#1a1200' : '#141414';
-    html+=`<tr style="border-bottom:1px solid #222;background:${bg};">
-      <td style="padding:8px;color:#888;">${c.numero}</td>
-      <td style="padding:8px;color:#e5e5e5;">${fechaBonita(c.fecha)}</td>
-      <td style="padding:8px;text-align:right;color:#d4af37;font-weight:700;">${fmt(c.monto)}</td>
-      <td style="padding:8px;text-align:right;color:#e5e5e5;">${fmt(c.montoPagado||0)}</td>
+    const bg = c.estado==='pagado' ? '#ecfdf3' : vencido ? '#fef2f2' : esHoy ? '#fdf6e3' : '#ffffff';
+    html+=`<tr style="border-bottom:1px solid #e7e5e4;background:${bg};">
+      <td style="padding:8px;color:#555555;">${c.numero}</td>
+      <td style="padding:8px;color:#111111;">${fechaBonita(c.fecha)}</td>
+      <td style="padding:8px;text-align:right;color:#111111;font-weight:700;">${fmt(c.monto)}</td>
+      <td style="padding:8px;text-align:right;color:#111111;">${fmt(c.montoPagado||0)}</td>
       <td style="padding:8px;text-align:center;">${badgeEstadoCuota(c.estado)}</td>
-      <td style="padding:8px;text-align:center;color:#aaa;font-size:11px;">${c.fechaPago?fechaBonita(c.fechaPago):'-'}</td>
-      <td style="padding:8px;color:#888;font-size:11px;" class="col-print-hide">${c.registradoNombre||'-'}</td>
-      <td style="padding:8px;color:#888;font-size:11px;">${c.nota||''}</td>
+      <td style="padding:8px;text-align:center;color:#444444;font-size:11px;">${c.fechaPago?fechaBonita(c.fechaPago):'-'}</td>
+      <td style="padding:8px;color:#555555;font-size:11px;" class="col-print-hide">${c.registradoNombre||'-'}</td>
+      <td style="padding:8px;color:#555555;font-size:11px;">${c.nota||''}</td>
       <td style="padding:8px;text-align:center;" class="no-print"><button onclick="abrirPago('${p.id}',${c.numero})" style="background:${c.estado==='pendiente'?'#166534':'#1e40af'};color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700;">${c.estado==='pendiente'?'Registrar':'Cambiar'}</button></td>
     </tr>`;
   });
   html+=`</tbody></table>`;
-  if(p.notas) html+=`<div style="margin-top:12px;font-size:13px;color:#aaa;"><strong style="color:#d4af37;">Notas:</strong> ${p.notas}</div>`;
+  if(p.notas) html+=`<div style="margin-top:12px;font-size:13px;color:#444444;"><strong style="color:#111111;">Notas:</strong> ${p.notas}</div>`;
   document.getElementById('contenido-detalle').innerHTML=html;
   abrirModal('modal-detalle');
 };
@@ -1899,9 +1914,9 @@ window.setFiltroEstado = function(val) {
       btn.style.color = '#000';
       btn.style.border = 'none';
     } else {
-      btn.style.background = '#1a1a1a';
-      btn.style.color = '#aaa';
-      btn.style.border = '1px solid #333';
+      btn.style.background = '#ffffff';
+      btn.style.color = '#444444';
+      btn.style.border = '1px solid #d6d3d1';
     }
   });
   renderPrestamos();
@@ -1917,9 +1932,9 @@ window.setFiltroTipo = function(val) {
       btn.style.color = '#000';
       btn.style.border = 'none';
     } else {
-      btn.style.background = '#1a1a1a';
-      btn.style.color = '#aaa';
-      btn.style.border = '1px solid #333';
+      btn.style.background = '#ffffff';
+      btn.style.color = '#444444';
+      btn.style.border = '1px solid #d6d3d1';
     }
   });
   renderPrestamos();
@@ -1935,9 +1950,9 @@ window.setFiltroPagosTipo = function(val) {
       btn.style.color = '#000';
       btn.style.border = 'none';
     } else {
-      btn.style.background = '#1a1a1a';
-      btn.style.color = '#aaa';
-      btn.style.border = '1px solid #333';
+      btn.style.background = '#ffffff';
+      btn.style.color = '#444444';
+      btn.style.border = '1px solid #d6d3d1';
     }
   });
   renderPagos();
