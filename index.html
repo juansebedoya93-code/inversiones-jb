@@ -1580,6 +1580,7 @@ window.eliminarGasto = async function(id) {
 
 function nombreTipo(t){ return {gasto:'💸 Gasto',retiro:'🏦 Retiro',ingreso:'💰 Ingreso',capital:'📥 Aporte',viaticos:'🛵 Viáticos'}[t]||t; }
 
+window.renderGastos = renderGastos;
 function renderGastos() {
   const mes=document.getElementById('mes-gastos').value||hoy().slice(0,7);
   const tbody=document.getElementById('tabla-gastos');
