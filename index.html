@@ -204,6 +204,7 @@
     <button onclick="setFiltroTipo('quincenal')" id="ft-quincenal" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">🗓️ Quincenal</button>
     <button onclick="setFiltroTipo('clavo')" id="ft-clavo" class="filtro-btn px-3 py-1 rounded text-sm font-semibold" style="background:#ffffff;color:#444444;border:1px solid #d6d3d1;">📌 Clavos</button>
   </div>
+  <div id="clavos-card" class="hidden mb-4"></div>
   <div id="resumen-saldos-prestamos" class="mb-3 text-sm"></div>
   <div class="rounded-lg shadow overflow-x-auto mb-6" style="background:#ffffff;border:1px solid #d6d3d1;">
     <table class="w-full text-sm">
@@ -756,6 +757,39 @@
 </div>
 
 <!-- ============ FIREBASE SDK Y LÓGICA ============ -->
+<!-- ============ MODAL ABONO A CLAVOS (cartera perdida) ============ -->
+<div id="modal-abono-clavos" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
+  <div class="modal-dark rounded-lg shadow-2xl w-full max-w-lg my-8">
+    <div class="p-4 rounded-t-lg flex justify-between items-center" style="background:#fef2f2;border-bottom:1px solid #fca5a5;">
+      <h3 class="text-xl font-bold" style="color:#b91c1c;">📌 Abono a Clavos</h3>
+      <button onclick="cerrarModal('modal-abono-clavos')" class="text-2xl">×</button>
+    </div>
+    <form id="form-abono-clavos" class="p-6 space-y-3">
+      <div id="abono-clavos-info"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Valor del abono *</label>
+          <input type="number" id="abono-clavos-monto" required min="1" step="1" oninput="previewAbonoClavos()" class="w-full p-2 border rounded text-lg font-bold" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Fecha *</label>
+          <input type="date" id="abono-clavos-fecha" required class="w-full p-2 border rounded" />
+        </div>
+      </div>
+      <div id="abono-clavos-preview" class="text-sm"></div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Nota</label>
+        <input type="text" id="abono-clavos-nota" class="w-full p-2 border rounded" placeholder="Ej: ganancia semana 2" />
+      </div>
+      <div class="flex gap-2 justify-end pt-3 border-t">
+        <button type="button" onclick="cerrarModal('modal-abono-clavos')" class="px-4 py-2 rounded" style="background:#e7e5e4;">Cancelar</button>
+        <button type="submit" id="btn-abono-clavos" class="text-black px-4 py-2 rounded font-semibold" style="background:linear-gradient(135deg,#d4af37,#b8860b);">💾 Registrar abono</button>
+      </div>
+      <div id="abono-clavos-historial" class="pt-3 border-t"></div>
+    </form>
+  </div>
+</div>
+
 <!-- ============ MODAL SALDO INICIAL ============ -->
 <div id="modal-saldo-inicial" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-start;justify-content:center;z-index:9999;padding:1rem;overflow-y:auto">
   <div class="modal-dark rounded-lg shadow-2xl w-full max-w-md my-8">
@@ -808,7 +842,7 @@ const dbFS = getFirestore(app);
 
 window.estado = {
   user: null, rol: null, nombre: null,
-  clientes: [], prestamos: [], gastos: [], usuarios: [], cajaMovs: [], cajaConfig: null,
+  clientes: [], prestamos: [], gastos: [], usuarios: [], cajaMovs: [], cajaConfig: null, abonosClavos: [],
   config: { interes: 20, cuotas: 30, mora: 20 }
 };
 window.filtroPrestamos = 'todos';
@@ -1042,6 +1076,7 @@ function iniciarSync() {
   unsubs.push(onSnapshot(collection(dbFS,'prestamos'),(snap)=>{ estado.prestamos=snap.docs.map(d=>({id:d.id,...d.data()})); refreshUI(); }));
   if(estado.rol==='admin') {
     unsubs.push(onSnapshot(collection(dbFS,'gastos'),(snap)=>{ estado.gastos=snap.docs.map(d=>({id:d.id,...d.data()})); refreshUI(); }));
+    unsubs.push(onSnapshot(collection(dbFS,'abonosClavos'),(snap)=>{ estado.abonosClavos=snap.docs.map(d=>({id:d.id,...d.data()})); refreshUI(); if(!document.getElementById('modal-abono-clavos').classList.contains('hidden')) renderModalAbonoClavos(); }));
     unsubs.push(onSnapshot(collection(dbFS,'caja'),(snap)=>{ estado.cajaMovs=snap.docs.map(d=>({id:d.id,...d.data()})); refreshUI(); }));
     unsubs.push(onSnapshot(doc(dbFS,'config','caja'),(snap)=>{ estado.cajaConfig=snap.exists()?snap.data():null; refreshUI(); }));
     unsubs.push(onSnapshot(collection(dbFS,'users'),(snap)=>{ estado.usuarios=snap.docs.map(d=>({id:d.id,...d.data()})); if(!document.getElementById('seccion-usuarios').classList.contains('hidden')) renderUsuarios(); }));
@@ -1322,7 +1357,13 @@ window.renderPrestamos = function() {
   const pagados=list.filter(p=>p.estado==='pagado');
   let activos=list.filter(p=>p.estado!=='pagado');
   if(window.filtroPrestamos!=='todos') activos=activos.filter(p=>p.estado===window.filtroPrestamos);
-  if(window.filtroTipoPrestamo!=='todos') activos=activos.filter(p=>window.filtroTipoPrestamo==='clavo'?p.clavo:(p.tipoCobro||'diario')===window.filtroTipoPrestamo);
+  // Los clavos salen de los activos: van juntos en "Clavos — Cartera perdida". Solo se ven con el filtro Clavos.
+  if(window.filtroTipoPrestamo==='clavo') activos=activos.filter(p=>esPrestamoClavo(p));
+  else {
+    activos=activos.filter(p=>!esPrestamoClavo(p));
+    if(window.filtroTipoPrestamo!=='todos') activos=activos.filter(p=>(p.tipoCobro||'diario')===window.filtroTipoPrestamo);
+  }
+  renderClavosCard();
 
   const filaActivo=p=>{
     const cli=estado.clientes.find(c=>c.id===p.clienteId);
@@ -1611,10 +1652,12 @@ window.renderPagos = function() {
 
   const pagos=[];
   estado.prestamos.forEach(p=>{
-    if(tipoFiltro!=='todos'){
-      if(tipoFiltro==='clavo'&&!p.clavo) return;
-      else if(tipoFiltro!=='clavo'&&(p.tipoCobro||'diario')!==tipoFiltro) return;
-    }
+    // Filtros excluyentes: los clavos solo salen en "Clavos"
+    const cliP=estado.clientes.find(c=>c.id===p.clienteId);
+    const esClavoP=!!(cliP?.clavo||p.clavo);
+    if(esClavoP) return; // los clavos no se cobran cuota por cuota: van en "Clavos — Cartera perdida"
+    if(tipoFiltro==='clavo') return;
+    if(tipoFiltro!=='todos' && (p.tipoCobro||'diario')!==tipoFiltro) return;
     (p.cuotas||[]).forEach(c=>{
       if(c.fecha<=fecha&&c.estado!=='pagado') pagos.push({prestamo:p,cuota:c,atrasado:c.fecha<fecha});
       else if(c.fecha===fecha&&c.estado==='pagado') pagos.push({prestamo:p,cuota:c,atrasado:false});
@@ -1646,12 +1689,25 @@ window.renderPagos = function() {
   if(busq) filtrados=pagos.filter(({prestamo})=>{ const cli=estado.clientes.find(c=>c.id===prestamo.clienteId); return (cli?.nombre||'').toLowerCase().includes(busq)||(cli?.telefono||'').includes(busq); });
   filtrados.sort((a,b)=>a.cuota.fecha.localeCompare(b.cuota.fecha));
 
+  if(tipoFiltro==='clavo'){
+    const r=resumenClavos();
+    tbody.innerHTML=r.clientes.length===0?'<tr><td colspan="6" class="p-8 text-center text-slate-400">No hay clientes marcados como clavo</td></tr>':
+      `<tr style="background:#fff7f7;" class="border-b">
+        <td class="p-3 font-semibold">📌 Clavos — Cartera perdida<div class="text-xs font-normal" style="color:#555555;">${r.clientes.length} cliente${r.clientes.length===1?'':'s'}: ${r.clientes.map(c=>c.nombre).join(', ')}</div></td>
+        <td class="p-3"></td>
+        <td class="p-3 text-right font-bold" style="color:#b91c1c;">${fmt(r.falta)}</td>
+        <td class="p-3 text-center text-xs">${r.ultimo?`Último abono<br><strong>${fmt(r.ultimo.monto)}</strong> · ${fechaBonita(r.ultimo.fecha)}`:'Sin abonos'}</td>
+        <td class="p-3 text-center">${r.abonadoEn(fecha)>0?`<strong style="color:#15803d;">${fmt(r.abonadoEn(fecha))}</strong>`:'—'}</td>
+        <td class="p-3 text-center">${estado.rol==='admin'&&r.falta>0?`<button onclick="abrirAbonoClavos()" class="text-white px-3 py-1 rounded text-xs font-semibold" style="background:#b91c1c;">💰 Abonar</button>`:''}</td>
+      </tr>`;
+    return;
+  }
   if(filtrados.length===0){ tbody.innerHTML='<tr><td colspan="6" class="p-8 text-center text-slate-400">Sin cuotas para esta fecha</td></tr>'; return; }
   tbody.innerHTML=filtrados.map(({prestamo,cuota,atrasado})=>{
     const cli=estado.clientes.find(c=>c.id===prestamo.clienteId);
     const mora=calcularMora(prestamo);
     return `<tr class="border-b ${atrasado&&cuota.estado!=='pagado'?'bg-red-50':''} hover:bg-slate-100">
-      <td class="p-3 font-semibold">${cli?cli.nombre:'?'}${prestamo.clavo?' <span class="text-xs text-red-600">📌</span>':''}</td>
+      <td class="p-3 font-semibold">${cli?cli.nombre:'?'}${(prestamo.clavo||cli?.clavo)?' <span class="text-xs text-red-600">📌</span>':''}</td>
       <td class="p-3">${cli?cli.telefono:''}</td>
       <td class="p-3 text-right">${fmt(mora.saldo)}</td>
       <td class="p-3 text-center">${cuota.numero}/${prestamo.numCuotas}<br><span class="text-xs text-slate-500">${fechaBonita(cuota.fecha)}</span></td>
@@ -1718,11 +1774,12 @@ function renderDashboard() {
   estado.prestamos.forEach(p=>{
     cap+=p.monto;
     const pag=(p.cuotas||[]).reduce((s,c)=>s+(c.montoPagado||0),0);
-    recup+=pag; enCalle+=(p.totalAPagar-pag);
+    recup+=pag;
     const e=estadoPrestamo(p);
-    if(e==='activo') act++; if(e==='mora'){ mora++; const m=calcularMora(p); recargoMora+=m.recargo; }
+    const clv=esPrestamoClavo(p);
+    if(!clv){ enCalle+=(p.totalAPagar-pag); if(e==='activo') act++; if(e==='mora'){ mora++; const m=calcularMora(p); recargoMora+=m.recargo; } }
     if(e==='pagado') gan+=(p.totalAPagar-p.monto);
-    (p.cuotas||[]).forEach(c=>{ if(c.estado!=='pagado'&&parseFecha(c.fecha)<hoyD) atr++; if((c.estado==='pagado'||c.estado==='parcial')&&c.fechaPago?.startsWith(mesAct)) cobMes+=c.montoPagado||0; });
+    (p.cuotas||[]).forEach(c=>{ if(!clv&&c.estado!=='pagado'&&parseFecha(c.fecha)<hoyD) atr++; if((c.estado==='pagado'||c.estado==='parcial')&&c.fechaPago?.startsWith(mesAct)) cobMes+=c.montoPagado||0; });
     if(p.fechaDesembolso?.startsWith(mesAct)) prestMes+=p.monto;
   });
   let tgm=0,trm=0,tim=0,tcm=0;
@@ -1737,6 +1794,7 @@ function renderDashboard() {
   document.getElementById('kpis').innerHTML=`
     <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500 cursor-pointer hover:shadow-lg" onclick="mostrarDesglose('prestado')"><div class="text-xs text-slate-500">Capital Prestado 🔍</div><div class="text-2xl font-bold text-blue-700">${fmt(cap)}</div></div>
     <div class="bg-white p-4 rounded-lg shadow border-l-4 border-amber-500 cursor-pointer hover:shadow-lg" onclick="mostrarDesglose('calle')"><div class="text-xs text-slate-500">Dinero en Calle 🔍</div><div class="text-2xl font-bold text-amber-700">${fmt(enCalle)}</div></div>
+    ${resumenClavos().clientes.length?`<div class="bg-white p-4 rounded-lg shadow border-l-4 border-red-500 cursor-pointer hover:shadow-lg" onclick="cambiarTab('prestamos')"><div class="text-xs text-slate-500">📌 Clavos — falta cubrir</div><div class="text-2xl font-bold text-red-700">${fmt(resumenClavos().falta)}</div></div>`:''}
     <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500 cursor-pointer hover:shadow-lg" onclick="mostrarDesglose('recuperado')"><div class="text-xs text-slate-500">Recuperado 🔍</div><div class="text-2xl font-bold text-green-700">${fmt(recup)}</div></div>
     <div class="bg-white p-4 rounded-lg shadow border-l-4 border-teal-500 col-span-2 md:col-span-1">
       <div class="text-xs text-slate-500 mb-2">💵 Caja</div>
@@ -1800,7 +1858,7 @@ window.mostrarDesglose = function(tipo) {
   estado.prestamos.forEach(p=>{ const cli=estado.clientes.find(x=>x.id===p.clienteId); const nombre=cli?cli.nombre:'?'; const cedula=cli?(cli.cedula||''):''; const pag=(p.cuotas||[]).reduce((s,c)=>s+(c.montoPagado||0),0); const enCalle=p.totalAPagar-pag; const est=estadoPrestamo(p);
     if(tipo==='prestado'){ total+=p.monto; rows.push({nombre,cedula,fecha:p.fechaDesembolso||'-',monto:p.monto,extra:est,extraClass:est==='pagado'?'text-green-600':est==='mora'?'text-red-600':'text-blue-600'}); }
     else if(tipo==='recuperado'&&pag>0){ total+=pag; const pct=Math.round(pag/p.totalAPagar*100); rows.push({nombre,cedula,fecha:p.fechaDesembolso||'-',monto:pag,extra:pct+'% recuperado',extraClass:pct>=100?'text-green-600':'text-amber-600'}); }
-    else if(tipo==='calle'&&enCalle>0){ total+=enCalle; rows.push({nombre,cedula,fecha:p.fechaDesembolso||'-',monto:enCalle,extra:est,extraClass:est==='mora'?'text-red-600':'text-blue-600'}); }
+    else if(tipo==='calle'&&enCalle>0&&!esPrestamoClavo(p)){ total+=enCalle; rows.push({nombre,cedula,fecha:p.fechaDesembolso||'-',monto:enCalle,extra:est,extraClass:est==='mora'?'text-red-600':'text-blue-600'}); }
   });
   rows.sort((a,b)=>b.monto-a.monto);
   const lbl={prestado:'Capital',recuperado:'Recuperado',calle:'En Calle'}[tipo];
@@ -1811,14 +1869,141 @@ window.mostrarDesglose = function(tipo) {
 };
 
 // ============================================================
+// CLAVOS — Cartera perdida (un solo "préstamo virtual" con todos los clavos)
+// ============================================================
+function esPrestamoClavo(p) {
+  const cli=estado.clientes.find(c=>c.id===p.clienteId);
+  return !!(p.clavo||cli?.clavo);
+}
+window.esPrestamoClavo = esPrestamoClavo;
+
+function resumenClavos() {
+  const porCliente={};
+  estado.prestamos.forEach(p=>{
+    if(!esPrestamoClavo(p)) return;
+    const saldo=Math.max(0,(p.totalAPagar||0)-(p.cuotas||[]).reduce((s,c)=>s+(c.montoPagado||0),0));
+    if(saldo<=0) return;
+    const cli=estado.clientes.find(c=>c.id===p.clienteId);
+    const k=p.clienteId;
+    if(!porCliente[k]) porCliente[k]={clienteId:k, nombre:cli?.nombre||'?', saldo:0, prestamos:0};
+    porCliente[k].saldo+=saldo; porCliente[k].prestamos++;
+  });
+  const clientes=Object.values(porCliente).sort((a,b)=>b.saldo-a.saldo);
+  const deuda=clientes.reduce((s,c)=>s+c.saldo,0);
+  const abonos=[...(estado.abonosClavos||[])].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')||(b.registradoAt||'').localeCompare(a.registradoAt||''));
+  const abonado=abonos.reduce((s,a)=>s+(a.monto||0),0);
+  return {clientes, deuda, abonos, abonado, falta:Math.max(0,deuda-abonado), ultimo:abonos[0]||null,
+    abonadoEn:f=>abonos.filter(a=>a.fecha===f).reduce((s,a)=>s+(a.monto||0),0)};
+}
+window.resumenClavos = resumenClavos;
+
+function renderClavosCard() {
+  const el=document.getElementById('clavos-card'); if(!el) return;
+  const r=resumenClavos();
+  if(r.clientes.length===0 && r.abonos.length===0){ el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  const pct=r.deuda>0?Math.min(100,Math.round(r.abonado/r.deuda*100)):100;
+  el.innerHTML=`<div class="rounded-lg p-4" style="background:#fff7f7;border:1px solid #fca5a5;">
+    <div class="flex justify-between items-start flex-wrap gap-3">
+      <div>
+        <div class="text-lg font-bold" style="color:#b91c1c;">📌 Clavos — Cartera perdida</div>
+        <div class="text-xs" style="color:#555555;">${r.clientes.length} cliente${r.clientes.length===1?'':'s'} marcado${r.clientes.length===1?'':'s'} como clavo · no cuentan en los préstamos activos</div>
+      </div>
+      ${estado.rol==='admin'?`<button onclick="abrirAbonoClavos()" class="text-white px-4 py-2 rounded font-semibold" style="background:#b91c1c;">💰 Abonar a clavos</button>`:''}
+    </div>
+    <div class="grid grid-cols-3 gap-3 mt-3 text-center">
+      <div class="rounded p-2" style="background:#ffffff;border:1px solid #fca5a5;"><div class="text-xs" style="color:#555555;">Deben en total</div><div class="font-bold text-lg" style="color:#111111;">${fmt(r.deuda)}</div></div>
+      <div class="rounded p-2" style="background:#ffffff;border:1px solid #86efac;"><div class="text-xs" style="color:#555555;">Abonado</div><div class="font-bold text-lg" style="color:#15803d;">${fmt(r.abonado)}</div></div>
+      <div class="rounded p-2" style="background:#ffffff;border:2px solid #b91c1c;"><div class="text-xs" style="color:#555555;">Falta por cubrir</div><div class="font-extrabold text-xl" style="color:#b91c1c;">${fmt(r.falta)}</div></div>
+    </div>
+    <div class="mt-2 h-2 rounded" style="background:#fee2e2;"><div class="h-2 rounded" style="width:${pct}%;background:#15803d;"></div></div>
+    <details class="mt-3"><summary class="text-sm font-semibold cursor-pointer" style="color:#b91c1c;">Ver clientes clavo (${r.clientes.length})</summary>
+      <div class="mt-2 text-sm">${r.clientes.map(c=>`<div class="flex justify-between border-b py-1"><span>📌 ${c.nombre}${c.prestamos>1?` <span class="text-xs" style="color:#555555;">(${c.prestamos} préstamos)</span>`:''}</span><span class="font-semibold">${fmt(c.saldo)}</span></div>`).join('')||'<div class="text-xs" style="color:#555555;">Sin saldos pendientes</div>'}</div>
+    </details>
+  </div>`;
+}
+window.renderClavosCard = renderClavosCard;
+
+window.abrirAbonoClavos = function() {
+  if(estado.rol!=='admin') return alert('Solo el administrador puede registrar abonos a clavos.');
+  document.getElementById('form-abono-clavos').reset();
+  document.getElementById('abono-clavos-fecha').value=hoy();
+  renderModalAbonoClavos();
+  abrirModal('modal-abono-clavos');
+  setTimeout(()=>document.getElementById('abono-clavos-monto').focus(),50);
+};
+
+function renderModalAbonoClavos() {
+  const r=resumenClavos();
+  document.getElementById('abono-clavos-info').innerHTML=`<div class="p-3 rounded" style="background:#fdf6e3;border:1px solid #b8860b;">
+    <div class="text-sm">Deben en total: <strong>${fmt(r.deuda)}</strong> · Abonado: <strong style="color:#15803d;">${fmt(r.abonado)}</strong></div>
+    <div class="text-sm mt-1">Falta por cubrir: <strong style="color:#b91c1c;font-size:20px;">${fmt(r.falta)}</strong></div></div>`;
+  document.getElementById('abono-clavos-historial').innerHTML=`<div class="font-semibold text-sm mb-2">🧾 Abonos registrados (${r.abonos.length})</div>`+
+    (r.abonos.length===0?'<div class="text-xs" style="color:#555555;">Todavía no hay abonos.</div>':
+    `<div style="max-height:220px;overflow-y:auto;"><table class="w-full text-xs"><tbody>${r.abonos.map((a,i)=>`<tr class="border-b">
+      <td class="py-1 pr-2" style="color:#555555;">${r.abonos.length-i}</td>
+      <td class="py-1">${fechaBonita(a.fecha)}</td>
+      <td class="py-1 text-right font-bold" style="color:#15803d;">${fmt(a.monto)}</td>
+      <td class="py-1 pl-2" style="color:#555555;">${a.porNombre||''}${a.nota?' · '+a.nota:''}</td>
+      <td class="py-1 text-right"><button type="button" onclick="anularAbonoClavos('${a.id}')" style="color:#b91c1c;background:none;border:none;cursor:pointer;">↩️ Anular</button></td>
+    </tr>`).join('')}</tbody></table></div>`);
+  previewAbonoClavos();
+}
+window.renderModalAbonoClavos = renderModalAbonoClavos;
+
+window.previewAbonoClavos = function() {
+  const r=resumenClavos();
+  const monto=parseFloat(document.getElementById('abono-clavos-monto').value)||0;
+  const el=document.getElementById('abono-clavos-preview');
+  if(monto<=0){ el.innerHTML=''; return; }
+  if(monto>r.falta){ el.innerHTML=`<div class="p-2 rounded" style="background:#fef2f2;color:#b91c1c;">⚠️ El abono es mayor que lo que falta por cubrir (${fmt(r.falta)}).</div>`; return; }
+  el.innerHTML=`<div class="p-2 rounded" style="background:#ecfdf3;border:1px solid #86efac;">Después del abono faltan: <strong>${fmt(r.falta-monto)}</strong>${r.falta-monto===0?' ✅ Clavos cubiertos':''}</div>`;
+};
+
+document.getElementById('form-abono-clavos').addEventListener('submit', async(e)=>{
+  e.preventDefault();
+  if(estado.rol!=='admin') return;
+  const r=resumenClavos();
+  const monto=Math.round(parseFloat(document.getElementById('abono-clavos-monto').value)||0);
+  const fecha=document.getElementById('abono-clavos-fecha').value||hoy();
+  const nota=document.getElementById('abono-clavos-nota').value.trim();
+  if(monto<=0) return alert('Escribe el valor del abono');
+  if(monto>r.falta) return alert(`El abono (${fmt(monto)}) es mayor que lo que falta por cubrir (${fmt(r.falta)}).`);
+  const btn=document.getElementById('btn-abono-clavos'); btn.disabled=true; btn.textContent='Guardando...';
+  try {
+    await addDoc(collection(dbFS,'abonosClavos'),{monto, fecha, nota, porId:estado.user?.uid||null, porNombre:estado.nombre||estado.user?.email||'', registradoAt:new Date().toISOString(), createdAt:serverTimestamp()});
+    await auditar('abono_clavos',`Abono: ${fmt(monto)}, Fecha: ${fecha}, Falta: ${fmt(r.falta-monto)}${nota?', Nota: '+nota:''}`);
+    document.getElementById('abono-clavos-monto').value=''; document.getElementById('abono-clavos-nota').value='';
+    alert(`✅ Abono de ${fmt(monto)} registrado.\nFaltan por cubrir: ${fmt(r.falta-monto)}`);
+  } catch(err){ alert('Error: '+err.message); }
+  btn.disabled=false; btn.textContent='💾 Registrar abono';
+});
+
+window.anularAbonoClavos = async function(id) {
+  if(estado.rol!=='admin') return;
+  const a=(estado.abonosClavos||[]).find(x=>x.id===id); if(!a) return;
+  if(!confirm(`¿Anular el abono de ${fmt(a.monto)} del ${fechaBonita(a.fecha)}?`)) return;
+  try {
+    await deleteDoc(doc(dbFS,'abonosClavos',id));
+    await auditar('anular_abono_clavos',`Abono anulado: ${fmt(a.monto)} del ${a.fecha}${a.nota?' ('+a.nota+')':''}`);
+  } catch(err){ alert('Error: '+err.message); }
+};
+
+// ============================================================
 // CAJA (saldo que debe haber en la cuenta)
 // ============================================================
 function movimientosCaja() {
   const movs=[];
   const cliNom=id=>estado.clientes.find(c=>c.id===id)?.nombre||'?';
   estado.prestamos.forEach(p=>{
-    if(p.fechaDesembolso && p.monto) movs.push({fecha:p.fechaDesembolso, orden:1, tipo:'📤 Préstamo entregado', detalle:cliNom(p.clienteId), monto:-(p.monto||0)});
+    // Si la 1ra cuota se descontó el mismo día del desembolso, se muestra una sola fila con lo entregado neto
+    const c1=(p.cuotas||[]).find(c=>c.numero===1);
+    const descontada=!!(c1 && c1.nota==='Pago al desembolso' && c1.fechaPago===p.fechaDesembolso && (c1.montoPagado||0)>0);
+    if(p.fechaDesembolso && p.monto) movs.push({fecha:p.fechaDesembolso, orden:1, tipo:'📤 Préstamo entregado',
+      detalle:descontada?`${cliNom(p.clienteId)} — préstamo ${fmt(p.monto)} menos 1ra cuota ${fmt(c1.montoPagado)}`:cliNom(p.clienteId),
+      monto:-((p.monto||0)-(descontada?(c1.montoPagado||0):0))});
     (p.cuotas||[]).forEach(c=>{
+      if(descontada && c===c1) return;
       if((c.estado==='pagado'||c.estado==='parcial') && c.fechaPago && (c.montoPagado||0)>0)
         movs.push({fecha:c.fechaPago, orden:2, tipo:'💰 Cobro', detalle:`${cliNom(p.clienteId)} — cuota ${c.numero}/${p.numCuotas||(p.cuotas||[]).length}`, monto:c.montoPagado||0});
     });
@@ -1867,20 +2052,12 @@ window.renderCaja = function() {
   if(filtro==='salidas') filas=filas.filter(m=>m.monto<0);
   const tbody=document.getElementById('tabla-caja');
   const mesInicio=inicio?inicio.slice(0,7):null;
-  let html='';
-  if(inicio && mesInicio<mes) {
-    const previos=movs.filter(m=>m.fecha<mes+'-01');
-    const saldoAnterior=previos.length?previos[previos.length-1].saldo:saldoInicial;
-    html+=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs" colspan="5"><strong>Saldo al empezar el mes</strong></td><td class="p-3 text-right font-bold">${fmt(saldoAnterior)}</td></tr>`;
-  }
-  const filaInicio=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs">${inicio?fechaBonita(inicio):''}</td><td class="p-3" colspan="4"><strong>⚙️ Saldo inicial de caja</strong></td><td class="p-3 text-right font-bold">${fmt(saldoInicial)}</td></tr>`;
-  let puesto=!(inicio && mesInicio===mes);
-  let n=0;
-  filas.forEach(m=>{
-    if(!puesto && !m.antes){ html+=filaInicio; puesto=true; }
-    n++;
-    html+=`<tr class="border-b" ${m.antes?'style="opacity:.55;"':''}>
-      <td class="p-3 text-center text-slate-500 font-semibold">${n}</td>
+  // Lo más reciente arriba; lo de antes del saldo inicial queda escondido abajo
+  filas.forEach((m,i)=>m.n=i+1);
+  const vigentes=filas.filter(m=>!m.antes).reverse();
+  const anteriores=filas.filter(m=>m.antes).reverse();
+  const fila=m=>`<tr class="border-b" ${m.antes?'style="opacity:.55;"':''}>
+      <td class="p-3 text-center text-slate-500 font-semibold">${m.n}</td>
       <td class="p-3 text-xs">${fechaBonita(m.fecha)}</td>
       <td class="p-3">${m.tipo}</td>
       <td class="p-3 text-xs">${m.detalle}</td>
@@ -1888,9 +2065,20 @@ window.renderCaja = function() {
       <td class="p-3 text-right font-semibold" style="color:#b91c1c;">${m.monto<0?fmt(-m.monto):''}</td>
       <td class="p-3 text-right font-bold">${m.antes?'<span class="text-xs font-normal">ya incluido en el saldo inicial</span>':(m.saldo!=null?fmt(m.saldo):'')}</td>
     </tr>`;
-  });
-  if(!puesto) html+=filaInicio;
-  if(n===0 && puesto && !(inicio && mesInicio===mes)) html+='<tr><td colspan="7" class="p-6 text-center text-slate-400">Sin movimientos este mes</td></tr>';
+  let html='';
+  if(vigentes.length) html+=vigentes.map(fila).join('');
+  else if(!(inicio && mesInicio>mes)) html+='<tr><td colspan="7" class="p-6 text-center text-slate-400">Sin movimientos nuevos en este mes</td></tr>';
+  if(inicio && mesInicio===mes) {
+    html+=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs">${fechaBonita(inicio)}</td><td class="p-3" colspan="4"><strong>⚙️ Saldo inicial de caja</strong></td><td class="p-3 text-right font-bold">${fmt(saldoInicial)}</td></tr>`;
+  } else if(inicio && mesInicio<mes) {
+    const previos=movs.filter(m=>m.fecha<mes+'-01');
+    const saldoAnterior=previos.length?previos[previos.length-1].saldo:saldoInicial;
+    html+=`<tr style="background:#fdf6e3;"><td class="p-3"></td><td class="p-3 text-xs" colspan="5"><strong>Saldo al empezar el mes</strong></td><td class="p-3 text-right font-bold">${fmt(saldoAnterior)}</td></tr>`;
+  }
+  if(anteriores.length) {
+    html+=`<tr><td colspan="7" class="p-3 text-center"><button onclick="window._cajaVerAntes=!window._cajaVerAntes; renderCaja();" class="text-sm font-semibold" style="color:#8a6a10;background:none;border:none;cursor:pointer;">${window._cajaVerAntes?'▼ Ocultar':'▶ Ver'} ${anteriores.length} movimiento${anteriores.length===1?'':'s'} de antes del saldo inicial (ya incluidos)</button></td></tr>`;
+    if(window._cajaVerAntes) html+=anteriores.map(fila).join('');
+  }
   tbody.innerHTML=html;
 
   const cuadres=(estado.cajaMovs||[]).filter(m=>m.tipo==='cuadre').sort((a,b)=>(b.creadoISO||'').localeCompare(a.creadoISO||''));
